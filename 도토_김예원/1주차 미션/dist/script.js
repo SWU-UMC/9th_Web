@@ -30,7 +30,7 @@ const completeTodo = (todo) => {
     doneTasks.push(todo);
     renderTask();
 };
-const deletTodo = (todo) => {
+const deleteTodo = (todo) => {
     doneTasks = doneTasks.filter((t) => t.id !== todo.id);
     renderTask();
 };
@@ -50,7 +50,7 @@ const createTodoElement = (todo, isDone) => {
     }
     button.addEventListener('click', () => {
         if (isDone) {
-            deletTodo(todo);
+            deleteTodo(todo);
         }
         else {
             completeTodo(todo);
@@ -66,3 +66,4 @@ todoForm.addEventListener('submit', (event) => {
         addTodo(text);
     }
 });
+renderTask();

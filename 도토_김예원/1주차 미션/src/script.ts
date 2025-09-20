@@ -61,7 +61,7 @@ const completeTodo = (todo:Todo): void =>{
 }
 
 // 완료 영역에서 todo 삭제하는 함수
-const deletTodo = (todo: Todo): void =>{
+const deleteTodo = (todo: Todo): void =>{
     // 선택이 안된 요소들은 필터를 거쳐 담게됨.
     doneTasks = doneTasks.filter((t): boolean => t.id !== todo.id);
     renderTask();
@@ -88,7 +88,7 @@ const createTodoElement =(todo:Todo, isDone: boolean): HTMLLIElement =>{
 
     button.addEventListener('click', (): void =>{
         if(isDone){
-            deletTodo(todo);
+            deleteTodo(todo);
         }
         else{
             completeTodo(todo);
@@ -109,3 +109,6 @@ todoForm.addEventListener('submit', (event: Event): void => {
         addTodo(text);
     }
 });
+
+// 페이지를 로드할 때도 리스트를 렌더링 해주는 것이 좋음.
+ renderTask();
