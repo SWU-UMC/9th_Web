@@ -25,7 +25,7 @@ const addTodo = (text) => {
     todoInput.value = '';
     renderTasks();
 };
-const compleTodo = (todo) => {
+const completeTodo = (todo) => {
     todos = todos.filter((t) => t.id !== todo.id);
     doneTasks.push(todo);
     renderTasks();
@@ -53,7 +53,7 @@ const createTodoElement = (todo, isDone) => {
             deleteTodo(todo);
         }
         else {
-            compleTodo(todo);
+            completeTodo(todo);
         }
     });
     li.appendChild(button);

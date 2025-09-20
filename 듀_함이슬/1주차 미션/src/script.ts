@@ -42,7 +42,7 @@ const addTodo = (text: string) : void => {
 }
 
 // 5. 할 일 상태 변경 (완료로 이동)
-const compleTodo = (todo: Todo) : void => {
+const completeTodo = (todo: Todo) : void => {
     todos = todos.filter((t) : boolean => t.id !== todo.id);
     doneTasks.push(todo);
     renderTasks();
@@ -75,7 +75,7 @@ const createTodoElement = (todo: Todo, isDone: boolean) : HTMLElement => {
         if (isDone) {
             deleteTodo(todo);
         } else {
-            compleTodo(todo);
+            completeTodo(todo);
         }
     });
 
