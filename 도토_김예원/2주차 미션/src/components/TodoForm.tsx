@@ -1,4 +1,5 @@
-import React from "react";
+import React, { useState, type FormEvent } from "react";
+import { useTodo } from "../context/TodoContext";
 
 interface TodoFormProps{
     input: string;
@@ -6,8 +7,23 @@ interface TodoFormProps{
     handleSubmit: (e: React.FormEvent<HTMLFormElement>) =>void;
 }
 
-const TodoForm =({input, setInput, handleSubmit}: 
-TodoFormProps) =>{
+const TodoForm =() =>{
+    const [input, setInput]= useState<string>('');
+    const {addTodo}=useTodo();
+    
+    const handleSubmit =(e: FormEvent<HTMLFormElement>) :void =>{
+        e.preventDefault();
+        const text = input.trim();
+    
+            if(text){
+                // addTodo자리
+                // 원본
+                // const newTodo:TTodo ={id:Date.now(),text};
+                // setTodos((prevTodos):TTodo[]=>[...prevTodos, newTodo]);
+                addTodo(text);
+                setInput('');
+            }
+    };
     return (
     <form onSubmit={handleSubmit}
             className="todo-container__form">

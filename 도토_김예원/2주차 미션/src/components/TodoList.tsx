@@ -1,5 +1,6 @@
-import React from "react";
+import React, { useContext } from "react";
 import type { TTodo } from "../types/todo";
+import { TodoContext } from "../context/TodoContext";
 
 interface TodoListProps{
     title: string;
@@ -11,6 +12,7 @@ interface TodoListProps{
 
 const TodoList =({title, todos, buttonLabel,
      buttonColor, onClick,}: TodoListProps)=>{
+        // const context = useContext(TodoContext);
     return (
         <div className="render-container__section">
             <h2 className="render-container__title">{title}</h2>
