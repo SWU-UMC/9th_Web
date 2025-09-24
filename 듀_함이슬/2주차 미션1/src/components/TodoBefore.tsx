@@ -19,25 +19,25 @@ const TodoBefore = () => {
         }
     };
 
-const completeTodo = (todo: TTodo) => {
-    setTodos(prevTodos => prevTodos.filter((t) => t.id !== todo.id));
-    setDoneTodos((prevDoneTodos) => [...prevDoneTodos, todo]);
-};
+    const completeTodo = (todo: TTodo) => {
+        setTodos(prevTodos => prevTodos.filter((t) => t.id !== todo.id));
+        setDoneTodos((prevDoneTodos) => [...prevDoneTodos, todo]);
+    };
 
-const deleteTodo = (todo: TTodo) => {
-    setDoneTodos((prevDoneTodo) => prevDoneTodo.filter((t) => t.id !== todo.id));
-}
+    const deleteTodo = (todo: TTodo) => {
+        setDoneTodos((prevDoneTodo) => prevDoneTodo.filter((t) => t.id !== todo.id));
+    }
 
     return (
         <div className="todo-container">
             <h1 className="todo-container__header">TODO LIST</h1>
             <form onSubmit={handleSubmit} className="todo-container__form">
-                <input 
-                value={input}
-                onChange={(e) => setInput(e.target.value)}
-                type="text" className="todo-container__input"
-                placeholder="할 일 입력" 
-                required />
+                <input
+                    value={input}
+                    onChange={(e) => setInput(e.target.value)}
+                    type="text" className="todo-container__input"
+                    placeholder="할 일 입력"
+                    required />
                 <button type="submit" className="todo-container__button">
                     할 일 추가
                 </button>
@@ -51,12 +51,12 @@ const deleteTodo = (todo: TTodo) => {
                                 <span className="render-container__item-text">
                                     {todo.text}
                                 </span>
-                                <button 
-                                onClick={() => completeTodo(todo)}
-                                style={{
-                                    backgroundColor: '#28a745',
-                                }}
-                                className="render-container__item-button">완료</button>
+                                <button
+                                    onClick={() => completeTodo(todo)}
+                                    style={{
+                                        backgroundColor: '#28a745',
+                                    }}
+                                    className="render-container__item-button">완료</button>
                             </li>
                         ))}
                     </ul>
@@ -69,19 +69,19 @@ const deleteTodo = (todo: TTodo) => {
                                 <span className="render-container__item-text">
                                     {todo.text}
                                 </span>
-                                <button 
-                                onClick={() => deleteTodo(todo)}
-                                style={{
-                                    backgroundColor: '#dc3545',
-                                }}
-                                className="render-container__item-button">삭제</button>
+                                <button
+                                    onClick={() => deleteTodo(todo)}
+                                    style={{
+                                        backgroundColor: '#dc3545',
+                                    }}
+                                    className="render-container__item-button">삭제</button>
                             </li>
                         ))}
                     </ul>
                 </div>
             </div>
         </div>
-        
+
     )
 }
 
