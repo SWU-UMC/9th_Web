@@ -2,23 +2,8 @@ import { useState, type FormEvent } from "react"
 import type { TTodo } from "../types/todo"
 
 const TodoBefore =()=> {
-    const [todos, setTodos] = useState<TTodo[]>([
-        // 테스트를 위한 객체 
-        // {
-        //     id: 1,
-        //     text: "맛있다",
-        // },
-        // {
-        //     id: 2,
-        //     text: "졸리다",
-        // },
-    ]);
-    const [doneTodos, setDoneTodos]= useState<TTodo[]>([
-        // {
-        //     id: 1,
-        //     text: "오타니",
-        // }
-    ]);
+    const [todos, setTodos] = useState<TTodo[]>([ ]);
+    const [doneTodos, setDoneTodos]= useState<TTodo[]>([]);
     const [input, setInput]= useState<string>('');
 
     const handleSubmit =(e: FormEvent<HTMLFormElement>) :void =>{
@@ -60,12 +45,6 @@ const TodoBefore =()=> {
                 <div className="render-container__section">
                     <h2 className="render-container__title">할 일</h2>
                     <ul id="todo-list" className="render-container__list">
-                        {/* 이 부분을 usestate를 활용하여 처리 */}
-                        {/* <li className="render-container__item">
-                            <span className="render-container__item-text">고구마</span>
-                            <button style={{backgroundColor: '#28a745'}}
-                            className="render-container__item-button">완료</button>
-                        </li> */}
                         {todos.map((todo): any=>(
                             <li key={todo.id} className="render-container__item">
                             <span className="render-container__item-text">{todo.text}</span>
@@ -79,11 +58,7 @@ const TodoBefore =()=> {
                 <div className="render-container__section">
                     <h2 className="render-container__title">완료</h2>
                     <ul id="todo-list" className="render-container__list">
-                        {/* <li className="render-container__item">
-                            <span className="render-container__item-text">고구마</span>
-                            <button style={{backgroundColor: '#dc3545'}}
-                            className="render-container__item-button">완료</button>
-                        </li> */}
+                        
                         {doneTodos.map((todo): any=>(
                             <li key={todo.id} className="render-container__item">
                             <span className="render-container__item-text">{todo.text}</span>

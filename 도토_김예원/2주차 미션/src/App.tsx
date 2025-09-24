@@ -1,14 +1,15 @@
 import './App.css'
-import TodoBefore from './components/TodoBefore.tsx';
 import Todo from './components/Todo';
 import { TodoProvider } from './context/TodoContext.tsx';
 
 function App(){
   return(
     <>
+    {/* 2주차 미션 01 */}
     <TodoProvider>
       <Todo/>
     </TodoProvider>
+
     </>
   );
 }

@@ -16,10 +16,6 @@ const TodoForm =() =>{
         const text = input.trim();
     
             if(text){
-                // addTodo자리
-                // 원본
-                // const newTodo:TTodo ={id:Date.now(),text};
-                // setTodos((prevTodos):TTodo[]=>[...prevTodos, newTodo]);
                 addTodo(text);
                 setInput('');
             }
