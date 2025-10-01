@@ -14,7 +14,7 @@ export const MovieInfo = ({ movie }: MovieInfoProps) => {
                 className="w-full h-130 object-cover" />
 
             {/* 영화 설명 뒷배경 오버레이 */}
-            <div className="absolute top-0 left-0 w-350 h-130 bg-gradient-to-r from-black/80 to-black/0 z-10"></div>
+            <div className="absolute top-0 left-0 w-350 h-130 bg-gradient-to-r from-black/80 to-black/0 z-10" />
 
             {/* 영화 설명 */}
             <div className="absolute inset-0 flex flex-col justify-start p-8 text-white z-20">

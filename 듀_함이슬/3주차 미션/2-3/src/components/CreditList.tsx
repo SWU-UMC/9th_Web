@@ -16,10 +16,14 @@ export const CreditList = ({ credits }: CreditListProps) => {
                         <div key={`cast-${member.id}-${index}`} className="flex flex-col items-center w-30">
                             {/* 출연진 프로필 */}
                             {member.profile_path ? (
-                                <img src={`https://image.tmdb.org/t/p/w200${member.profile_path}`} alt={member.name}
-                                    className="w-20 h-20 object-cover rounded-full mb-2 mx-auto border-2 border-white" />
+                                <img
+                                    src={`https://image.tmdb.org/t/p/w200${member.profile_path}`}
+                                    alt={member.name}
+                                    className="w-20 h-20 object-cover rounded-full 
+                                    mb-2 mx-auto border-2 border-white" />
                             ) : (
-                                <div className="w-20 h-20 bg-black rounded-full mb-2 mx-auto border-2 border-white" />
+                                <div className="w-20 h-20 bg-black rounded-full mb-2 
+                                mx-auto border-2 border-white" />
                             )}
                             {/* 출연진 이름, 역할 */}
                             <p className="text-sm text-white text-center">{member.name}</p>
@@ -31,10 +35,14 @@ export const CreditList = ({ credits }: CreditListProps) => {
                     .map((member, index) => (
                         <div key={`crew-${member.id}-${index}`} className="flex flex-col items-center w-30">
                             {member.profile_path ? (
-                                <img src={`https://image.tmdb.org/t/p/w200${member.profile_path}`} alt={member.name}
-                                    className="w-20 h-20 object-cover rounded-full mb-2 mx-auto border-2 border-white" />
+                                <img
+                                    src={`https://image.tmdb.org/t/p/w200${member.profile_path}`}
+                                    alt={member.name}
+                                    className="w-20 h-20 object-cover rounded-full 
+                                    mb-2 mx-auto border-2 border-white" />
                             ) : (
-                                <div className="w-20 h-20 bg-black rounded-full mb-2 mx-auto border-2 border-white" />
+                                <div className="w-20 h-20 bg-black rounded-full 
+                                mb-2 mx-auto border-2 border-white" />
                             )}
                             <p className="text-sm text-white text-center">{member.name}</p>
                             <p className="text-sm text-white text-center">({member.known_for_department})</p>
