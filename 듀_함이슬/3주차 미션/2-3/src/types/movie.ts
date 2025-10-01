@@ -35,21 +35,16 @@ export type MovieDetail = {
 
 };
 
+export type creditMember = {
+    id: number;
+    known_for_department: string;
+    name: string;
+    profile_path: string | null;
+};
+
 export type credits = {
     id: number;
-    cast: {
-        id: number;
-        known_for_department: string;
-        name: string;
-        profile_path: string;
-        
-    }[];
-    crew: {
-        id: number;
-        known_for_department: string;
-        name: string;
-        profile_path: string;
-
-    }[];
+    cast: creditMember[];
+    crew: creditMember[];
 
 };
