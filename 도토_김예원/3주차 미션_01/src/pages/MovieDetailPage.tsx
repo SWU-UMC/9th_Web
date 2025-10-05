@@ -5,49 +5,49 @@ import { LoadingSpinner } from "../components/LoadingSpinner";
 import type { MovieDetails, Credits } from "../types/movieDetail";
 
 const MovieDetailPage = () => {
-// 영화 id 가져오기.
+  // 영화 id 가져오기.
   const { movieId } = useParams<{ movieId: string }>();
-// 영화 상세 정보
+  // 영화 상세 정보
   const [details, setDetails] = useState<MovieDetails | null>(null);
-// 영화 출연진 정보
+  // 영화 출연진 정보
   const [credits, setCredits] = useState<Credits | null>(null);
-// 로딩
+  // 로딩
   const [isPending, setIsPending] = useState(false);
-// 에러
+  // 에러
   const [isError, setError] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
       setIsPending(true);
 
-    //   영화 상세 정보 api
+      //   영화 상세 정보 api
       try {
         const detailsRes = await axios.get<MovieDetails>(
-        `https://api.themoviedb.org/3/movie/${movieId}?language=en-US`,
-        {
-          headers: {
-            Authorization: `Bearer ${import.meta.env.VITE_TMDB_KEY}`,
-          },
-        }
-      );
-      setDetails(detailsRes.data);
+          `https://api.themoviedb.org/3/movie/${movieId}?language=en-US`,
+          {
+            headers: {
+              Authorization: `Bearer ${import.meta.env.VITE_TMDB_KEY}`,
+            },
+          }
+        );
+        setDetails(detailsRes.data);
 
-    // 영화 출연진 정보 api
-      const creditsRes = await axios.get<Credits>(
-        `https://api.themoviedb.org/3/movie/${movieId}/credits?language=en-US`,
-        {
-          headers: {
-            Authorization: `Bearer ${import.meta.env.VITE_TMDB_KEY}`,
-          },
-        }
-      );
-      setCredits(creditsRes.data);
+        // 영화 출연진 정보 api
+        const creditsRes = await axios.get<Credits>(
+          `https://api.themoviedb.org/3/movie/${movieId}/credits?language=en-US`,
+          {
+            headers: {
+              Authorization: `Bearer ${import.meta.env.VITE_TMDB_KEY}`,
+            },
+          }
+        );
+        setCredits(creditsRes.data);
 
-    } catch (err) {
+      } catch (err) {
         setError(true);
-    } finally {
+      } finally {
         setIsPending(false);
-    }
+      }
     };
 
     fetchData();
@@ -87,7 +87,7 @@ const MovieDetailPage = () => {
           <p className="mt-10 font-bold text-2xl text-gray-700">영화 상세 정보</p>
           <p className="mt-4">평점: {details.vote_average}</p>
           <p className="mt-4">상영 시간: {details.runtime}분</p>
-          <p className="mt-6">개요:<br/> "{details.overview}"</p>
+          <p className="mt-6">개요:<br /> "{details.overview}"</p>
 
         </div>
       </div>
@@ -100,11 +100,16 @@ const MovieDetailPage = () => {
             {/* 최대 12명만 출력 */}
             {credits.cast.slice(0, 12).map((actor) => (
               <div key={actor.id} className="text-center">
-                <img
-                    src={`https://image.tmdb.org/t/p/w200${actor.profile_path}`}
-                    alt={actor.name}
-                    className="rounded-lg"
-                  />
+                {/* 프로필이 없는 경우도 고려 */}
+                {actor.profile_path ? (<img
+                  src={`https://image.tmdb.org/t/p/w200${actor.profile_path}`}
+                  alt={actor.name}
+                  className="rounded-lg" />
+                ) : (
+                  <div className="w-[150px] h-[225px] bg-gray-300 flex items-center justify-center rounded-lg">
+                    No Image
+                  </div>
+                )}
                 <p className="mt-2 text-sm font-bold">{actor.name}</p>
                 <p className="text-xs text-gray-500">{actor.character}</p>
               </div>

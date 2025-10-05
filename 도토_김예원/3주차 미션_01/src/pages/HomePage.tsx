@@ -1,14 +1,14 @@
 import { Outlet } from "react-router-dom";
-import{Navbar} from '../components/Navbar';
+import { Navbar } from '../components/Navbar';
 
-const HomePage=()=>{
-    return(
+const HomePage = () => {
+    return (
         <>
-        <Navbar/>
-        <Outlet/>
+            <Navbar />
+            <Outlet />
         </>
     );
-       
+
 };
 
 export default HomePage;

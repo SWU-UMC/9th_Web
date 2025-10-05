@@ -1,7 +1,7 @@
-export type Movie={
+export type Movie = {
     adult: boolean;
     backdrop_path: string;
-    genre_ids:number[];
+    genre_ids: number[];
     id: number;
     original_language: string;
     original_title: string;
@@ -15,9 +15,9 @@ export type Movie={
     vote_count: number;
 }
 
-export type MovieResponse={
-    page:number;
-    results:Movie[];
-    total_pages:number;
-    total_results:number;
+export type MovieResponse = {
+    page: number;
+    results: Movie[];
+    total_pages: number;
+    total_results: number;
 }
