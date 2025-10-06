@@ -1,48 +1,60 @@
-import { useEffect, useState } from "react";
-import axios from 'axios';
-import { type MovieResponse, type Movie } from "../types/movie";
+// import { useEffect, useState } from "react";
+// import axios from 'axios';
+// import { type MovieResponse, type Movie } from "../types/movie";
 import MovieCard from "../components/MovieCard";
 import { LoadingSpinner } from "../components/LoadingSpinner";
 import { useParams } from "react-router-dom";
+//  추가
+import { useState } from "react";
+import { type MovieResponse } from "../types/movie";
+import { useCustomFetch } from "../hooks/useCustomFetch";
+
 
 export default function MoviePage() {
-  const [movies, setMovies] = useState<Movie[]>([]);
+  // hook으로 처리
+  // const [movies, setMovies] = useState<Movie[]>([]);
 
   // 로딩 상태
-  const [isPending, setIsPending] = useState(false);
+  // const [isPending, setIsPending] = useState(false);
 
   // 에러 상태
-  const [isError, setError] = useState(false);
+  // const [isError, setError] = useState(false);
 
   // 페이지 처리
   const [page, setPage] = useState(1);
-
   const { category } = useParams<{
     category: string;
   }>();
 
-  useEffect(() => {
-    const fetchMovies = async () => {
-      setIsPending(true);
-      try {
-        const { data } = await axios.get<MovieResponse>(
-          `https://api.themoviedb.org/3/movie/${category}?language=en-US&page=${page}`,
-          {
-            headers: {
-              Authorization: `Bearer ${import.meta.env.VITE_TMDB_KEY}`,
-            },
-          }
-        );
-        setMovies(data.results);
-      } catch (err) {
-        setError(true);
-      } finally {
-        setIsPending(false);
-      }
-    };
+  // useEffect(() => {
+  //   const fetchMovies = async () => {
+  //     setIsPending(true);
+  //     try {
+  //       const { data } = await axios.get<MovieResponse>(
+  //         `https://api.themoviedb.org/3/movie/${category}?language=en-US&page=${page}`,
+  //         {
+  //           headers: {
+  //             Authorization: `Bearer ${import.meta.env.VITE_TMDB_KEY}`,
+  //           },
+  //         }
+  //       );
+  //       setMovies(data.results);
+  //     } catch (err) {
+  //       setError(true);
+  //     } finally {
+  //       setIsPending(false);
+  //     }
+  //   };
 
-    fetchMovies();
-  }, [page, category]);
+  //   fetchMovies();
+  // }, [page, category]);
+
+  // 훅으로 처리
+  // 훅에 url 전송.
+  const url = category
+    ? `https://api.themoviedb.org/3/movie/${category}?language=en-US&page=${page}`
+    : null;
+  const { data, isPending, isError } = useCustomFetch<MovieResponse>(url);
 
   // 로딩 중
   // if (!isPending){
@@ -81,13 +93,22 @@ export default function MoviePage() {
         </div>
       )}
 
-      {!isPending && (
+      {/* {!isPending && (
         <div className="p-10 grid gap-4 grid-cols-2 sm:grid-cols-3 md:grid-cols-4 
         lg:grid-cols-5 xl:grid-cols-6">
           {movies?.map((movie) => (
             <MovieCard key={movie.id} movie={movie} />
           ))}
         </div>
+      )} */}
+
+      {/* 훅으로 관리 */}
+      {!isPending && (<div className="p-10 grid gap-4 grid-cols-2 sm:grid-cols-3 md:grid-cols-4 
+         lg:grid-cols-5 xl:grid-cols-6">
+        {data?.results.map((movie) => (
+          <MovieCard key={movie.id} movie={movie} />
+        ))}
+      </div>
       )}
     </>
   );
