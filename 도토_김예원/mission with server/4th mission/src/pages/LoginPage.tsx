@@ -1,9 +1,15 @@
 import { useState } from "react";
 import { validateSignin, type UserSigninInformation } from "../utils/validate";
 import useForm from "../hooks/useForm";
+import { useLocalStorage } from "../hooks/useLocalStorage";
+import { LOCAL_STORAGE_KEY } from "../constants/key";
+// import type { RequestSigninDto } from "../types/auth";
+import { postSignin } from "../apis/auth";
+
 
 const LoginPage = () => {
 
+    const { setItem } = useLocalStorage(LOCAL_STORAGE_KEY.accessToken);
     const { values, errors, touched, getInputProps } = useForm<UserSigninInformation>({
         initialValue: {
             email: "",
@@ -20,9 +26,16 @@ const LoginPage = () => {
 
     // };
 
-    const handleSubmit = () => {
+    const handleSubmit = async () => {
         console.log(values);
-
+        try {
+            const response = await postSignin(values); // ✅ await 사용 가능
+            setItem(response.data.accessToken);
+            console.log("로그인 성공:", response);
+        } catch (error: any) {
+            console.error(error);
+            alert(error?.message || "로그인 중 오류가 발생했습니다.");
+        }
     };
     const isDisabled = Object.values(errors || {}).some((error) => error.length > 0) ||
         Object.values(values).some((value) => value === "");
