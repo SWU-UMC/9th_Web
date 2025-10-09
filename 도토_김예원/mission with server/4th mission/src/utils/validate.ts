@@ -3,6 +3,7 @@ export type UserSigninInformation = {
     password: string;
 };
 
+// 이메일 형식과 비밀번호 길이 검사
 function validateUser(values: UserSigninInformation) {
     const errors = {
         email: "",
@@ -18,6 +19,7 @@ function validateUser(values: UserSigninInformation) {
     }
     return errors;
 }
+
 function validateSignin(values: UserSigninInformation) {
     return validateUser(values);
 }

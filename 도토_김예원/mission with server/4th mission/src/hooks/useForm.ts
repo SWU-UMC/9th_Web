@@ -34,14 +34,13 @@ function useForm<T>({ initialValue, validate }: UseFormProps<T>) {
         return{value,onChange, onBlur };
     };
 
+    // 사용자가 값을 입력할 때마다 validate()가 실행되어 error 상태 자동 업데이트
     useEffect(()=>{
         const newErrors=validate(values);
         setErrors(newErrors);
     },[validate, values]);
 
     return{values, errors, touched, getInputProps};
-
-
 }
 
 export default useForm;
