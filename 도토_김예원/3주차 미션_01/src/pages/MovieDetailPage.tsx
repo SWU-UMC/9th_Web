@@ -1,20 +1,20 @@
-import { useParams } from "react-router-dom";
+// 커스텀 훅을 활용하기 전 import.
 // import { useEffect, useState } from "react";
 // import axios from "axios";
+import { useParams } from "react-router-dom";
 import { LoadingSpinner } from "../components/LoadingSpinner";
 import type { MovieDetails, Credits } from "../types/movieDetail";
+//  커스텀 훅을 활용하기 위한 import.
 import { useCustomFetch } from "../hooks/useCustomFetch";
+import NotFoundPage from "./NotFoundPage";
 
 const MovieDetailPage = () => {
-  // 영화 id 가져오기.
-  const { movieId } = useParams<{ movieId: string }>();
+  // 커스텀 hook으로 처리하기 이전 선언
   // 영화 상세 정보
   // const [details, setDetails] = useState<MovieDetails | null>(null);
   // 영화 출연진 정보
   // const [credits, setCredits] = useState<Credits | null>(null);
-  // 로딩
   // const [isPending, setIsPending] = useState(false);
-  // 에러
   // const [isError, setError] = useState(false);
 
   // useEffect(() => {
@@ -54,7 +54,25 @@ const MovieDetailPage = () => {
   //   fetchData();
   // }, [movieId]);
 
-  // 훅으로 처리
+  // if (isPending) {
+  //   return (
+  //     <div className="flex justify-center items-center h-dvh">
+  //       <LoadingSpinner />
+  //     </div>
+  //   );
+  // }
+
+  // if (isError) {
+  //   return (
+  //     <div className="text-red-500 text-xl text-center">데이터를 불러오지 못했습니다.</div>
+  //   );
+  // }
+
+
+  // 영화 id 가져오기.
+  const { movieId } = useParams<{ movieId: string }>();
+  
+   // 커스텀 hook로 처리
   const detailsUrl= movieId 
   ?`https://api.themoviedb.org/3/movie/${movieId}?language=en-US`
   : null; 
@@ -72,14 +90,7 @@ const MovieDetailPage = () => {
     isError: creditsError,
   } = useCustomFetch<Credits>(creditsUrl);
 
-  // 로딩 중
-  // if (isPending) {
-  //   return (
-  //     <div className="flex justify-center items-center h-dvh">
-  //       <LoadingSpinner />
-  //     </div>
-  //   );
-  // }
+  // 로딩
   if (detailsPending || creditsPending) {
      return (
        <div className="flex justify-center items-center h-dvh">
@@ -88,20 +99,17 @@ const MovieDetailPage = () => {
      );
    }
 
-  // 에러 중
-  // if (isError) {
-  //   return (
-  //     <div className="text-red-500 text-xl text-center">데이터를 불러오지 못했습니다.</div>
-  //   );
-  // }
+   // 에러
   if (detailsError || creditsError) {
      return (
-       <div className="text-red-500 text-xl text-center">데이터를 불러오지 못했습니다.</div>
+      <div className="text-red-500 text-xl text-center">
+        <NotFoundPage/>
+      </div>
      );
    }
 
   // 데이터가 없을 경우 처리
-  if (!details) return null;
+  if (!details || !credits) return null;
 
   return (
     <div className="p-6 max-w-5xl mx-auto">
@@ -119,7 +127,6 @@ const MovieDetailPage = () => {
           <p className="mt-4">평점: {details.vote_average}</p>
           <p className="mt-4">상영 시간: {details.runtime}분</p>
           <p className="mt-6">개요:<br /> "{details.overview}"</p>
-
         </div>
       </div>
 

@@ -1,31 +1,24 @@
+// 커스텀 훅을 활용하기 전 import.
 // import { useEffect, useState } from "react";
 // import axios from 'axios';
 // import { type MovieResponse, type Movie } from "../types/movie";
 import MovieCard from "../components/MovieCard";
 import { LoadingSpinner } from "../components/LoadingSpinner";
 import { useParams } from "react-router-dom";
-//  추가
+//  커스텀 훅을 활용하기 위한 import.
 import { useState } from "react";
 import { type MovieResponse } from "../types/movie";
 import { useCustomFetch } from "../hooks/useCustomFetch";
+import NotFoundPage from "./NotFoundPage";
 
 
 export default function MoviePage() {
-  // hook으로 처리
+  // 커스텀 hook으로 처리하기 이전 선언
   // const [movies, setMovies] = useState<Movie[]>([]);
-
-  // 로딩 상태
   // const [isPending, setIsPending] = useState(false);
-
-  // 에러 상태
   // const [isError, setError] = useState(false);
 
-  // 페이지 처리
-  const [page, setPage] = useState(1);
-  const { category } = useParams<{
-    category: string;
-  }>();
-
+  // 커스텀 hook으로 처리하기 이전 직접 데이터를 호출하는 함수.
   // useEffect(() => {
   //   const fetchMovies = async () => {
   //     setIsPending(true);
@@ -49,24 +42,30 @@ export default function MoviePage() {
   //   fetchMovies();
   // }, [page, category]);
 
-  // 훅으로 처리
-  // 훅에 url 전송.
-  const url = category
-    ? `https://api.themoviedb.org/3/movie/${category}?language=en-US&page=${page}`
-    : null;
-  const { data, isPending, isError } = useCustomFetch<MovieResponse>(url);
-
-  // 로딩 중
+  // 로딩
   // if (!isPending){
   //     return<LoadingSpinner/>
   // }
 
-  // 에러 중
-  if (isError) {
-    return (<div>
-      <span className="text-red-500 text-2xl">에러가 발생했습니다.</span>
-    </div>);
-  }
+  // 에러 
+  // if (isError) {
+  //   return (<div>
+  //     <span className="text-red-500 text-2xl">에러가 발생했습니다.</span>
+  //   </div>);
+  // }
+
+  // 페이지 처리
+  const [page, setPage] = useState(1);
+  const { category } = useParams<{
+    category: string;
+  }>();
+
+  // 커스텀 hook로 처리
+  const url = category
+    ? `https://api.themoviedb.org/3/movie/${category}?language=en-US&page=${page}`
+    : null;
+  // 커스텀 hook을 호출하여 값 받기.
+  const { data, isPending, isError } = useCustomFetch<MovieResponse>(url);
 
   return (
     <>
@@ -87,12 +86,28 @@ export default function MoviePage() {
           {`>`}
         </button>
       </div>
+
+      {/* 훅으로 관리 */}
       {isPending && (
         <div className="flex item-center justify-center h-dvh">
           <LoadingSpinner />
         </div>
       )}
+      {isError && (
+        <div className="flex item-center justify-center h-dvh">
+          <NotFoundPage />
+        </div>
+      )}
 
+      {!isPending && !isError && (<div className="p-10 grid gap-4 grid-cols-2 sm:grid-cols-3 md:grid-cols-4 
+         lg:grid-cols-5 xl:grid-cols-6">
+        {data?.results.map((movie) => (
+          <MovieCard key={movie.id} movie={movie} />
+        ))}
+      </div>
+      )}
+
+      {/* hook로 관리하기 이전 */}
       {/* {!isPending && (
         <div className="p-10 grid gap-4 grid-cols-2 sm:grid-cols-3 md:grid-cols-4 
         lg:grid-cols-5 xl:grid-cols-6">
@@ -101,16 +116,6 @@ export default function MoviePage() {
           ))}
         </div>
       )} */}
-
-      {/* 훅으로 관리 */}
-      {!isPending && (<div className="p-10 grid gap-4 grid-cols-2 sm:grid-cols-3 md:grid-cols-4 
-         lg:grid-cols-5 xl:grid-cols-6">
-        {data?.results.map((movie) => (
-          <MovieCard key={movie.id} movie={movie} />
-        ))}
-      </div>
-      )}
     </>
   );
-
 }

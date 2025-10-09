@@ -1,6 +1,8 @@
 import axios from "axios";
 import { useEffect, useState } from "react";
 
+// 데이터를 호출하고, 로딩 에러 로직을 담은 커스텀 훅
+// 타입을 모르므로 제너럴 타입으로 작성
 export function useCustomFetch<T>(url: string | null) {
     const [data, setData] = useState<T | null>(null);
     const [isPending, setIsPending] = useState(false);
@@ -30,6 +32,7 @@ export function useCustomFetch<T>(url: string | null) {
         };
 
         fetchData();
+        // 의존성 배열에 url를 넣어 주소가 바뀔때마다 실행
     }, [url]);
 
     return { data, isPending, isError };
