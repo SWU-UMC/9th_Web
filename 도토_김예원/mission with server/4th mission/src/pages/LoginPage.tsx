@@ -19,11 +19,13 @@ const LoginPage = () => {
         validate: validateSignin,
     });
 
+    // 로그인 api호출 + 에러 처리 + 로컬스토리지에 저장
     const handleSubmit = async () => {
         try {
             const response = await postSignin(values);
             setItem(response.data.accessToken);
             console.log("로그인 성공:", response);
+            navigate("/my");
         } catch (error: any) {
             console.error(error);
             alert(error?.message || "로그인 중 오류가 발생했습니다.");
