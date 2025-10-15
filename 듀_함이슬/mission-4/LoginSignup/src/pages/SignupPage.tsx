@@ -1,9 +1,10 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm, type SubmitHandler } from "react-hook-form";
+import { FormProvider, useForm, type SubmitHandler } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
 import z from "zod";
 import { postSignup } from "../apis/auth";
 import { useState } from "react";
+import SignupStep from "../components/SignupStep";
 
 const schema = z.object({
     email: z.string().email({ message: "올바른 이메일 형식이 아닙니다." }),
@@ -30,19 +31,13 @@ const schema = z.object({
         path: ['passwordCheck'],
     });
 
-type FormFields = z.infer<typeof schema>
+export type FormFields = z.infer<typeof schema>;
 
 const SignupPage = () => {
     const [step, setStep] = useState(0);
     const navigate = useNavigate();
 
-    const {
-        register,
-        handleSubmit,
-        trigger, //단계별 검사에 사용
-        getValues, //이메일 표시용
-        formState: { errors, isSubmitting },
-    } = useForm<FormFields>({
+    const methods = useForm<FormFields>({
         defaultValues: {
             name: "",
             email: "",
@@ -52,6 +47,11 @@ const SignupPage = () => {
         resolver: zodResolver(schema),
         mode: "onBlur",
     });
+
+    const { 
+        register,
+        getValues, //이메일 표시용
+        formState: { errors } } = methods;
 
     //마지막 단계에서 회원가입 요청
     const onSubmit: SubmitHandler<FormFields> = async (data) => {
@@ -66,17 +66,6 @@ const SignupPage = () => {
         } catch (error) {
             console.error("회원가입 실패:", error);
         }
-    };
-
-    // 단계 이동 로직 이메일-> 비밀번호 -> 이름
-    const handleNext = async () => {
-        let fieldsToValidate: (keyof FormFields)[] = [];
-        if (step === 0) fieldsToValidate = ['email'];
-        if (step === 1) fieldsToValidate = ['password', 'passwordCheck'];
-        if (step === 2) fieldsToValidate = ['name'];
-
-        const isValid = await trigger(fieldsToValidate);
-        if (isValid) setStep((prev) => prev + 1);
     };
 
     //비밀번호 보기 토글
@@ -170,14 +159,13 @@ const SignupPage = () => {
                         )}
                     </>
                 )}
+                <FormProvider {...methods}>
+                    <SignupStep
+                        step={step}
+                        setStep={setStep}
+                        onSubmit={onSubmit} />
+                </FormProvider>
 
-                <button
-                    disabled={isSubmitting}
-                    type='button'
-                    onClick={step === 2 ? handleSubmit(onSubmit) : handleNext}
-                    className="w-full bg-blue-600 text-white py-3 rounded-md text-lg font-medium hover:bg-blue-700 transition-colors cursor-pointer disabled:bg-gray-300">
-                    {step === 2 ? "회원가입 종료" : "다음"}
-                </button>
             </div>
         </div>
     );
