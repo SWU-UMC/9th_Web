@@ -6,9 +6,12 @@ import LoginPage from './pages/LoginPage'
 import HomeLayout from './layout/HomeLayout'
 import SignupPage from './pages/SignupPage'
 import Mypage from './pages/MyPage'
+import { AuthPovider } from './context/AuthContext'
+import ProtectedLayout from './layout/ProtectedLayout'
+import GoogleLoginRedirectPage from './pages/GoogleLoginRedirectPage'
 
-
-const router = createBrowserRouter([
+// 인증 없이 접근 가능한 라우트
+const publicRoutes=[
   {
     path: "/",
     element: <HomeLayout />,
@@ -18,16 +21,50 @@ const router = createBrowserRouter([
       { index: true, element: <HomePage /> },
       { path: 'login', element: <LoginPage /> },
       { path: 'signup', element: <SignupPage /> },
-      { path: 'my', element: <Mypage /> },
-    ]
-  }
-])
+      {path:'v1/auth/google/callback',element:<GoogleLoginRedirectPage/>}
+    ],
+  },
+];
+
+// 인증이 필요한 라우트
+const protectedRoutes=[
+  {
+    path:"/",
+    element: <ProtectedLayout />,
+    errorElement: <NotFoundPage />,
+    children:[
+      {
+      path:"my",
+      element:<Mypage/>,
+      }
+    ],
+  },
+];
+
+
+const router = createBrowserRouter([
+  // {
+  //   path: "/",
+  //   element: <HomeLayout />,
+  //   errorElement: <NotFoundPage />,
+  //   children: [
+  //     { index: true, element: <HomePage /> },
+  //     { path: 'login', element: <LoginPage /> },
+  //     { path: 'signup', element: <SignupPage /> },
+  //     { path: 'my', element: <Mypage /> },
+  //   ]
+  // }
+  ...publicRoutes,
+  ...protectedRoutes,
+]);
 
 function App() {
   return (
     <>
+    <AuthPovider>
       <RouterProvider router={router}
       />
+    </AuthPovider>
     </>
   )
 }
