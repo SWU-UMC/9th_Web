@@ -1,13 +1,20 @@
 import { useNavigate } from "react-router-dom";
 import { validateSignin, type UserSigninInformation } from "../utils/validate";
-import { postSignin } from "../apis/auth";
-import { useLocalStorage } from "../hooks/useLocalStorage";
-import { LOCAL_STORAGE_KEY } from "../constants/key";
 import useForm from "../hooks/useForm";
+import { useAuth } from "../context/AuthContext";
+import { useEffect } from "react";
 
 const LoginPage = () => {
 
-    const {setItem} = useLocalStorage(LOCAL_STORAGE_KEY.accessToken)
+    const { login, accessToken } = useAuth();
+    const navigate = useNavigate();
+
+    useEffect(() => {
+        if (accessToken) {
+            navigate("/");
+        }
+    }, [navigate, accessToken]);
+
     const { values, errors, touched, getInputProps } = useForm<UserSigninInformation>({
         initialValue: {
             email: "",
@@ -17,22 +24,18 @@ const LoginPage = () => {
     });
 
     const handleSubmit = async () => {
-        console.log(values);
-        try{
-            const response = await postSignin(values);
-            setItem(response.data.accessToken);
-            console.log(response);
-        } catch (error) {
-            alert(error?.message) 
-        }
+        await login(values);
+    };
+
+    const handleGoogleLogin = () => {
+        window.location.href =
+            import.meta.env.VITE_SERVER_API_URL + "/v1/auth/google/login";
     };
 
     //오류가 하나라도 있거니, 입력값이 비어있으면 버튼을 비활성화
     const isDisabled =
         Object.values(errors || {}).some((error) => error, length > 0) || //오류가 있으면 true
         Object.values(values).some((value) => value === "");  //입력값이 비어있으면 true
-
-    const navigate = useNavigate();
 
 
     return (
@@ -70,6 +73,16 @@ const LoginPage = () => {
                     disabled={isDisabled}
                     className="w-full bg-blue-600 text-white py-3 rounded-md text-lg font-medium hover:bg-blue-700 transition-colors cursor-pointer disabled:bg-gray-300">
                     로그인
+                </button>
+                <button
+                    type='button'
+                    onClick={handleGoogleLogin}
+
+                    className="w-full bg-blue-600 text-white py-3 rounded-md text-lg font-medium hover:bg-blue-700 transition-colors cursor-pointer disabled:bg-gray-300">
+                    <div className="flex items-center justify-center gap-4">
+                        <img src={"/images/google.svg"} alt="Google Logo Image" />
+                        <span>구글 로그인</span>
+                    </div>
                 </button>
             </div>
         </div>
