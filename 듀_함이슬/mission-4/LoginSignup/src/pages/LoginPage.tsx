@@ -34,7 +34,7 @@ const LoginPage = () => {
 
     //오류가 하나라도 있거니, 입력값이 비어있으면 버튼을 비활성화
     const isDisabled =
-        Object.values(errors || {}).some((error) => error, length > 0) || //오류가 있으면 true
+        Object.values(errors || {}).some((error) => error.length > 0) || //오류가 있으면 true
         Object.values(values).some((value) => value === "");  //입력값이 비어있으면 true
 
 
