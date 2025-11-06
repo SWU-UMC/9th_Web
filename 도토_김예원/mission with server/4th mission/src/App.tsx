@@ -9,6 +9,14 @@ import Mypage from './pages/MyPage'
 import { AuthPovider } from './context/AuthContext'
 import ProtectedLayout from './layout/ProtectedLayout'
 import GoogleLoginRedirectPage from './pages/GoogleLoginRedirectPage'
+import LpDetailPage from './pages/LpDetailPage'
+
+// ✅ React Query import
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+
+// ✅ 클라이언트 생성
+const queryClient = new QueryClient()
+
 
 // 인증 없이 접근 가능한 라우트
 const publicRoutes=[
@@ -32,11 +40,9 @@ const protectedRoutes=[
     path:"/",
     element: <ProtectedLayout />,
     errorElement: <NotFoundPage />,
-    children:[
-      {
-      path:"my",
-      element:<Mypage/>,
-      }
+    children: [
+      { path: 'my', element: <Mypage /> },
+      { path: 'lp/:lpid', element: <LpDetailPage /> }, 
     ],
   },
 ];
@@ -61,10 +67,11 @@ const router = createBrowserRouter([
 function App() {
   return (
     <>
-    <AuthPovider>
-      <RouterProvider router={router}
-      />
-    </AuthPovider>
+      <AuthPovider>
+        <QueryClientProvider client={queryClient}>
+          <RouterProvider router={router} />
+        </QueryClientProvider>
+      </AuthPovider>
     </>
   )
 }
