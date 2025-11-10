@@ -1,13 +1,18 @@
 import { useInfiniteQuery } from "@tanstack/react-query";
-import { useEffect, useRef } from "react";
+import { useState,useEffect, useRef } from "react";
 import { getLpsList } from "../apis/lps";
 import { useNavigate } from "react-router-dom";
-import type { LpItem, LpListResponse } from "../types/lps";
+import type { LpItem } from "../types/lps";
+import LpWriteModal from "../components/LpWriteModal";
+
 
 export const HomePage = () => {
   const navigate = useNavigate();
   const observerRef = useRef<HTMLDivElement | null>(null);
   const sort: "latest" | "oldest" = "latest";
+
+  // 모달
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   // ✅ LP 목록 무한스크롤
   const {
@@ -111,6 +116,17 @@ export const HomePage = () => {
 
       {/* ✅ 스크롤 트리거 */}
       <div ref={observerRef} className="h-10" />
+
+      {/* ✅ + 버튼 */}
+      <button
+        onClick={() => setIsModalOpen(true)}
+        className="fixed bottom-8 right-8 bg-blue-600 hover:bg-blue-800 text-white rounded-full w-14 h-14 flex items-center justify-center text-3xl font-bold shadow-lg transition-all"
+      >
+        +
+      </button>
+
+      {/* ✅ 모달 */}
+      {isModalOpen && <LpWriteModal onClose={() => setIsModalOpen(false)} />}
     </div>
   );
 };

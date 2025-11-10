@@ -1,38 +1,4 @@
-import { axiosInstance } from "./axios";
 
-// export const getLpsList = async (sort: "latest" | "oldest") => {
-//   const response = await axiosInstance.get(`/v1/lps?sort=${sort}`);
-//   // ✅ 서버 응답 구조 확인 후 배열만 반환
-//    console.log("📦 /v1/lps response:", response.data);
-//   return response.data.data.data;
-// };
-
-// export const getLpsList = async ({
-//   pageParam = 1,
-//   sort,
-// }: {
-//   pageParam?: number;
-//   sort: "latest" | "oldest";
-// }) => {
-//   const baseUrl = import.meta.env.VITE_SERVER_API_URL;
-
-//   const response = await fetch(`${baseUrl}/v1/lps?page=${pageParam}&sort=${sort}`, {
-//     method: "GET",
-//     headers: {
-//       "Content-Type": "application/json",
-//       Authorization: `Bearer ${localStorage.getItem("accessToken") || ""}`,
-//     },
-//   });
-
-//   if (!response.ok) {
-//     throw new Error("LP 목록을 불러오지 못했습니다.");
-//   }
-
-//   // ✅ response.json()으로 데이터 반환
-//   return response.json();
-// };
-
-// src/apis/lps.ts
 export const getLpDetail = async (lpid: string) => {
   const baseUrl = import.meta.env.VITE_SERVER_API_URL;
   const token =
@@ -57,13 +23,8 @@ export const getLpDetail = async (lpid: string) => {
   return res.json();
 };
 
-export const getLpsList = async ({
-  pageParam = 1,
-  sort = "latest",
-}: {
-  pageParam?: number;
-  sort?: "latest" | "oldest";
-}) => {
+
+export const getLpsList = async ({ pageParam = 1, sort = "latest" }) => {
   const baseUrl = import.meta.env.VITE_SERVER_API_URL;
   const token = localStorage.getItem("accessToken");
 
@@ -74,6 +35,7 @@ export const getLpsList = async ({
     },
   });
 
-  if (!res.ok) throw new Error("LP 목록 불러오기 실패");
-  return res.json();
+  const result = await res.json();
+  console.log("📦 getLpsList result:", result); 
+  return result;
 };

@@ -34,3 +34,19 @@ export const postLogout =async()=>{
     const{data}=await axiosInstance.post("v1/auth/signout");
     return data;
 };
+
+export const updateMyInfo = async (data: {
+  name?: string;
+  bio?: string;
+  avatar?: string;
+}) => {
+  const res = await axiosInstance.patch("/v1/users", data, {
+    headers: { "Content-Type": "application/json" },
+  });
+  return res.data;
+};
+
+export const deleteUser = async () => {
+  const { data } = await axiosInstance.delete("/v1/users");
+  return data;
+};
