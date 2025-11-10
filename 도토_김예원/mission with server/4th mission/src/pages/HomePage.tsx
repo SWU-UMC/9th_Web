@@ -1,31 +1,34 @@
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { useEffect, useRef } from "react";
-import { getLpsList, getLpDetail } from "../apis/lps";
+import { getLpsList } from "../apis/lps";
 import { useNavigate } from "react-router-dom";
+import type { LpItem, LpListResponse } from "../types/lps";
 
 export const HomePage = () => {
   const navigate = useNavigate();
   const observerRef = useRef<HTMLDivElement | null>(null);
-  const sort = "latest"; // 정렬 상태 예시
+  const sort: "latest" | "oldest" = "latest";
 
-  // ✅ 무한스크롤 쿼리
+  // ✅ LP 목록 무한스크롤
   const {
-    data,
-    fetchNextPage,
-    hasNextPage,
-    isFetchingNextPage,
-    isLoading,
-  } = useInfiniteQuery({
-    queryKey: ["lps", sort],
-    queryFn: ({ pageParam = 1 }) => getLpsList({ pageParam, sort }),
-    getNextPageParam: (lastPage) =>
-      lastPage?.data?.hasNext ? lastPage.data.nextCursor : undefined,
-    initialPageParam: 1,
-    staleTime: 1000 * 60 * 5,
-    gcTime: 1000 * 60 * 30,
-  });
+  data,
+  fetchNextPage,
+  hasNextPage,
+  isFetchingNextPage,
+  isLoading,
+} = useInfiniteQuery({
+  queryKey: ["lps", sort],
+  queryFn: ({ pageParam = 1 }) => getLpsList({ pageParam: pageParam as number, sort }),
+  getNextPageParam: (lastPage) =>
+    lastPage?.data?.hasNext
+      ? (lastPage.data.nextCursor as number | undefined)
+      : undefined,
+  initialPageParam: 1,
+  staleTime: 1000 * 60 * 5,
+  gcTime: 1000 * 60 * 30,
+});
 
-  // ✅ 스크롤 감지
+  // ✅ 무한 스크롤 IntersectionObserver
   useEffect(() => {
     const observer = new IntersectionObserver((entries) => {
       if (entries[0].isIntersecting && hasNextPage) {
@@ -35,26 +38,26 @@ export const HomePage = () => {
 
     const currentRef = observerRef.current;
     if (currentRef) observer.observe(currentRef);
+
     return () => {
       if (currentRef) observer.unobserve(currentRef);
     };
   }, [hasNextPage, fetchNextPage]);
 
-  // ✅ 스켈레톤 UI
+  // ✅ 스켈레톤 카드
   const SkeletonCard = () => (
-    <div className="w-full h-48 bg-gray-400 animate-pulse rounded-md" />
+    <div className="w-full h-48 bg-gray-200 animate-pulse rounded-md" />
   );
 
   return (
     <div className="p-8">
-      {/* ✅ 목록 */}
+      {/* ✅ LP 목록 */}
       <ul className="grid grid-cols-4 gap-4">
-        {/* 첫 로딩 시 스켈레톤 */}
         {isLoading ? (
           Array.from({ length: 8 }).map((_, idx) => <SkeletonCard key={idx} />)
         ) : (
           data?.pages.map((page, pageIndex) =>
-            page.data.data.map((item: any) => (
+            page.data.data.map((item: LpItem) => (
               <li
                 key={`${pageIndex}-${item.id}`}
                 onClick={() => navigate(`/lp/${item.id}`)}
@@ -73,7 +76,7 @@ export const HomePage = () => {
                   </div>
                 )}
 
-                {/* ✅ hover 정보 */}
+                {/* ✅ hover 시 표시 */}
                 <div className="absolute inset-0 flex flex-col justify-end p-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300 text-white bg-gradient-to-t from-black/70 via-transparent to-transparent">
                   <p className="font-semibold text-base truncate">
                     {item.title}
@@ -97,7 +100,7 @@ export const HomePage = () => {
         )}
       </ul>
 
-      {/* ✅ 다음 페이지 로딩 시 스켈레톤 표시 */}
+      {/* ✅ 추가 로딩 */}
       {isFetchingNextPage && (
         <div className="grid grid-cols-4 gap-4 mt-4">
           {Array.from({ length: 8 }).map((_, idx) => (
@@ -107,7 +110,7 @@ export const HomePage = () => {
       )}
 
       {/* ✅ 스크롤 트리거 */}
-      <div ref={observerRef} className="h-10"></div>
+      <div ref={observerRef} className="h-10" />
     </div>
   );
 };
