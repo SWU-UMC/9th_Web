@@ -8,6 +8,9 @@ import { useMutation } from "@tanstack/react-query";
 const LoginPage = () => {
   const navigate = useNavigate();
   const { login } = useAuth();
+  // 로그인이 된 상태일 떄 accessToken이 있는 상태에서 로그인 페이지로 말고 홈으로 연결되도록
+  // uesEffect 사용
+
 
   const { values, errors, touched, getInputProps } =
     useForm<UserSigninInformation>({
@@ -33,21 +36,24 @@ const LoginPage = () => {
   };
 
   // 기존 직접 처리 코드 (주석으로 보관)
-  /*
-  const handleSubmit = async () => {
-    await login(values);
-    navigate("/my");
-  };
-  */
+  // const handleSubmit = async () => {
+  //   await login(values);
+  //   navigate("/my");
+  // };
+  
 
   const isDisabled =
     Object.values(errors || {}).some((error) => error.length > 0) ||
     Object.values(values).some((value) => value === "");
 
+  // 구글 로그인 함수
   const handleGoogleLogin = () => {
-    window.location.href = `${
+    // 정확한 내용을 위해 확인하는 습관 기르기
+    console.log(import.meta.env.VITE_SERVER_API_URL);
+
+    window.location.href =
       import.meta.env.VITE_SERVER_API_URL
-    }/v1/auth/google/login?prompt=select_account`;
+    +"/v1/auth/google/login?prompt=select_account";
   };
 
   return (

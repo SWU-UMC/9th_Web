@@ -1,3 +1,6 @@
+// context >> AuthContex
+// 로그인 및 로그아웃 토큰 저장 로직
+// useAuth 존재 
 import { createContext, useContext, useState, type PropsWithChildren } from "react";
 import type { RequestSigninDto } from "../types/auth";
 import { useLocalStorage } from "../hooks/useLocalStorage";
@@ -7,10 +10,11 @@ import { postLogout, postSignin, deleteUser } from "../apis/auth";
 interface AuthContextType {
   accessToken: string | null;
   refreshToken: string | null;
-  userName: string | null;
-  setUserName: (name: string | null) => void;
   login: (signInData: RequestSigninDto) => Promise<void>;
   logout: () => Promise<void>;
+
+  userName: string | null;
+  setUserName: (name: string | null) => void;
   withdraw: () => Promise<void>;
 }
 
@@ -37,6 +41,7 @@ export const AuthPovider = ({ children }: PropsWithChildren) => {
     removeItem: removeRefreshTokenFromStorage,
   } = useLocalStorage(LOCAL_STORAGE_KEY.refreshToken);
 
+  // 상태 설정
   const [accessToken, setAccessToken] = useState<string | null>(
     getAccessTokenFromStorage(),
   );
@@ -45,12 +50,14 @@ export const AuthPovider = ({ children }: PropsWithChildren) => {
   );
   const [userName, setUserName] = useState<string | null>(null);
 
-  // ✅ 로그인
+  // 로그인
   const login = async (signinData: RequestSigninDto) => {
     try {
-      const response = await postSignin(signinData); // 전체 응답
-      const userData = response.data; // ✅ 내부 data 추출
+      
+      // 구조 분해로 처리하기 
+      const { data: userData } = await postSignin(signinData);
 
+      // 데이터가 있다면(로그인을 성공했다면)
       if (userData) {
         const newAccessToken = userData.accessToken;
         const newRefreshToken = userData.refreshToken;
@@ -60,9 +67,12 @@ export const AuthPovider = ({ children }: PropsWithChildren) => {
         setAccessToken(newAccessToken);
         setRefreshToken(newRefreshToken);
 
-        setUserName(userData.name || "익명"); // ✅ 닉네임 저장
+        // 닉네임 저장
+        setUserName(userData.name || "익명"); 
 
-        alert("로그인 성공!");
+        alert("로그인 성공");
+        // 네비게이션 훅은 RouterProvider안에서만 사용이 가능하기에 이렇게 처리
+        window.location.href = "/me";
       }
     } catch (error) {
       console.error("로그인 오류:", error);
@@ -70,9 +80,10 @@ export const AuthPovider = ({ children }: PropsWithChildren) => {
     }
   };
 
-  // ✅ 로그아웃
+  // 로그아웃
   const logout = async () => {
     try {
+      // 불러올 데이터가 없으므로 그저 로그아웃 함수 실행
       await postLogout();
 
       removeAccessTokenFromStorage();
@@ -113,10 +124,11 @@ export const AuthPovider = ({ children }: PropsWithChildren) => {
       value={{
         accessToken,
         refreshToken,
-        userName,
-        setUserName,
         login,
         logout,
+
+        userName,
+        setUserName,
         withdraw,
       }}
     >
@@ -125,6 +137,9 @@ export const AuthPovider = ({ children }: PropsWithChildren) => {
   );
 };
 
+
+// 훅으로 처리 및 우산이 안 쓰여 졌을 때 처리
+// 이거는 hook 폴더에 따로 분류해두는게 더 좋을려나...
 export const useAuth = () => {
   const context = useContext(AuthContext);
   if (!context) throw new Error("AuthContext를 찾을 수 없습니다");

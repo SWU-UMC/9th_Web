@@ -1,4 +1,4 @@
-import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import { createBrowserRouter, RouterProvider, type RouteObject } from "react-router-dom";
 import "./App.css";
 import HomePage from "./pages/HomePage";
 import NotFoundPage from "./pages/NotFoundPage";
@@ -14,9 +14,10 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
 const queryClient = new QueryClient();
 
-const router = createBrowserRouter([
+
+// 인증 없이 접근 가능한 라우트
+const publicRoutes: RouteObject[] = [
   {
-    // ✅ 최상단 한 번만 HomeLayout
     path: "/",
     element: <HomeLayout />,
     errorElement: <NotFoundPage />,
@@ -24,19 +25,27 @@ const router = createBrowserRouter([
       { index: true, element: <HomePage /> },
       { path: "login", element: <LoginPage /> },
       { path: "signup", element: <SignupPage /> },
+      // 구글 로그인 리다이렉 주소
       { path: "v1/auth/google/callback", element: <GoogleLoginRedirectPage /> },
-
-      // ✅ 보호 라우트는 HomeLayout 안에서만 작동하도록 함
-      {
-        element: <ProtectedLayout />, // Navbar 포함 X
-        children: [
-          { path: "my", element: <Mypage /> },
-          { path: "lp/:lpid", element: <LpDetailPage /> },
-        ],
-      },
     ],
   },
-]);
+];
+
+// 인증이 필요한(토큰 검사) 라우트
+// 토큰 검사 후 페이지 연결은 레이아웃에 로직 구현
+const protectedRoutes: RouteObject[] = [
+  {
+    path: "/",
+    element: <ProtectedLayout />,
+    errorElement: <NotFoundPage />,
+    children: [
+      { path: "my", element: <Mypage /> },
+      { path: "lp/:lpid", element: <LpDetailPage /> },
+    ],
+  },
+];
+
+const router = createBrowserRouter([...publicRoutes,...protectedRoutes]);
 
 function App() {
   return (
