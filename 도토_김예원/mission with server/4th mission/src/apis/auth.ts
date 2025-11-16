@@ -2,12 +2,13 @@ import { axiosInstance } from "./axios.ts";
 import type {
     RequestSigninDto,
     RequestSignupDto,
-    ResponseMyInfoDto,
     ResponseSigninDto,
-    ResponseSignupDto
+    ResponseSignupDto,
+
+    ResponseMyInfoDto,
 } from "../types/auth";
 
-
+// 회원가입 
 export const postSignup = async (
     body: RequestSignupDto): 
     Promise<ResponseSignupDto> => {
@@ -16,6 +17,7 @@ export const postSignup = async (
     return data;
 };
 
+// 로그인 
 export const postSignin = async (
     body: RequestSigninDto,): 
     Promise<ResponseSigninDto> => {
@@ -24,8 +26,27 @@ export const postSignin = async (
     return data;
 };
 
-export const getMyInfo = async (): Promise<ResponseMyInfoDto> => {
-    const { data } = await axiosInstance.get("/v1/users/me",{});
-   
+// 로그아웃 
+export const postLogout =async()=>{
+    const{data}=await axiosInstance.post("v1/auth/signout");
     return data;
+};
+
+
+
+
+export const updateMyInfo = async (data: {
+  name?: string;
+  bio?: string;
+  avatar?: string;
+}) => {
+  const res = await axiosInstance.patch("/v1/users", data, {
+    headers: { "Content-Type": "application/json" },
+  });
+  return res.data;
+};
+
+export const deleteUser = async () => {
+  const { data } = await axiosInstance.delete("/v1/users");
+  return data;
 };
