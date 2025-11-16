@@ -3,10 +3,16 @@ import { getLpList } from "../../apis/lp";
 import type { PAGINATION_ORDER } from "../../types/common";
 import { QUERY_KEY } from "../../constants/key";
 
+// 쿼리 실행 여부 외부에서 제어하기 위한 옵션
+interface useGetInfiniteLpListOptions {
+    enabled?: boolean;
+}
+
 function useGetInfiniteLpList(
     limit: number,
     search: string,
     order: PAGINATION_ORDER,
+    options?: useGetInfiniteLpListOptions,
 ) {
     return useInfiniteQuery({
         queryFn: ({ pageParam }) =>
@@ -17,7 +23,10 @@ function useGetInfiniteLpList(
             // console.log(lastPage, allPages);
             return lastPage.data.hasNext ? lastPage.data.nextCursor : undefined;
         },
+        enabled: options?.enabled ?? true,
+        staleTime: 1000 * 60 * 1,
+        gcTime: 1000 * 60 * 5,
     });
-}
+};
 
 export default useGetInfiniteLpList;

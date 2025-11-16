@@ -1,23 +1,16 @@
 import { NavLink, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
-import { useEffect, useState } from "react";
 import { Sidebar } from "./Sidebar";
 import { getMyInfo } from "../apis/auth";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { QUERY_KEY } from "../constants/key";
+import useSidebar from "../hooks/useSidebar";
 
-const MOBILE_BREAKPOINT = 768;
 
 export const Navbar = () => {
     const { accessToken } = useAuth();
 
-    const [isSidebarOpen, setIsSidebarOpen] = useState(
-        window.innerWidth >= MOBILE_BREAKPOINT
-    );
-
-    const toggleSidebar = () => {
-        setIsSidebarOpen(!isSidebarOpen);
-    };
+    const { isOpen, toggle, close } = useSidebar();
 
     const navigate = useNavigate();
     const { logout } = useAuth();
@@ -39,26 +32,13 @@ export const Navbar = () => {
         enabled: !!accessToken,
     });
 
-    useEffect(() => {
-        const handleResize = () => {
-            if (window.innerWidth < MOBILE_BREAKPOINT) {
-                setIsSidebarOpen(false)
-            }
-            else { setIsSidebarOpen(true) }
-        };
-        window.addEventListener("resize", handleResize);
-        return () => {
-            window.removeEventListener("resize", handleResize);
-        };
-    }, []);
-
 
     return (
         <>
             <div className="fixed top-0 w-full flex items-center z-50 gap-5 p-4 bg-gray-100">
-                <button onClick={toggleSidebar}
+                <button onClick={toggle}
                     className="px-1">
-                    {isSidebarOpen ?
+                    {isOpen ?
                         (<img src={"/images/burger.svg"} alt="burger image" className="w-6 h-6" />) :
                         (<img src={"/images/burger.svg"} alt="burger image" className="w-6 h-6" />
                         )}
@@ -98,7 +78,7 @@ export const Navbar = () => {
                 </div>
             </div>
 
-            <Sidebar width={150} isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} />
+            <Sidebar width={150} isOpen={isOpen} onClose={close} />
 
         </>
     );

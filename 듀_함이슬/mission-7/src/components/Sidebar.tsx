@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useAuth } from "../context/AuthContext";
 import { NavLink, useNavigate } from "react-router-dom";
 import { useMutation } from "@tanstack/react-query";
@@ -43,13 +43,39 @@ export const Sidebar = ({ width = 280, isOpen, onClose }: SidebarProps) => {
         setIseModalOpen(false);
     };
 
+    //ESC 키로 닫기
+    useEffect(() => {
+        const handleEscKey = (e: KeyboardEvent) => {
+            if (isOpen && e.key === "Escape") {
+                onClose();
+            }
+        };
+        document.addEventListener("keydown", handleEscKey);
+        return () => {
+            window.removeEventListener("keydown", handleEscKey);
+        };
+    }, [isOpen, onClose]);
+
+    // 배경 스크롤 방지
+    useEffect(() => {
+        if (isOpen) {
+            document.body.style.overflow = "hidden"; // 스크롤 막기
+        } else {
+            document.body.style.overflow = "unset"; // 스크롤 복구
+        }
+
+        return () => {
+            document.body.style.overflow = "unset";
+        };
+    }, [isOpen]);
+
     return (
         <>
-            <div className="flex flex-col fixed top-0 left-0 z-40 h-full bg-gray-100 overflow-y-auto"
+            <div className="flex flex-col fixed top-0 left-0 z-40 h-full bg-gray-100 overflow-y-auto
+            transform transition-transform duration-300 ease-in-out"
                 style={{
                     width: `${width}px`,
                     transform: `translateX(${xPosition}px)`,
-                    transition: "transform 0.3s ease-in-out",
                 }}>
                 <nav className="flex flex-col gap-4 p-4 mt-15">
                     <NavLink to="/search"
