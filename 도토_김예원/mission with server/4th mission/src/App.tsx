@@ -11,6 +11,7 @@ import ProtectedLayout from "./layout/ProtectedLayout";
 import GoogleLoginRedirectPage from "./pages/GoogleLoginRedirectPage";
 import LpDetailPage from "./pages/LpDetailPage";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import {ReactQueryDevtools} from "@tanstack/react-query-devtools";
 
 const queryClient = new QueryClient();
 
@@ -52,6 +53,7 @@ function App() {
     <AuthPovider>
       <QueryClientProvider client={queryClient}>
         <RouterProvider router={router} />
+        {import.meta.env.DEV&&<ReactQueryDevtools/>}
       </QueryClientProvider>
     </AuthPovider>
   );

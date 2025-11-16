@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react";
-import { getMyInfo, updateMyInfo } from "../apis/auth";
+// import { getMyInfo, updateMyInfo } from "../apis/auth";
+import { updateMyInfo } from "../apis/auth";
+import { getMyProfile } from "../apis/user";
 import type { ResponseMyInfoDto } from "../types/auth";
 import { IoIosArrowBack } from "react-icons/io";
 import { useNavigate } from "react-router-dom";
@@ -22,7 +24,7 @@ const MyPage = () => {
 
   useEffect(() => {
     const getData = async () => {
-      const response = await getMyInfo();
+      const response = await getMyProfile();
       setData(response);
       setForm({
         name: response?.data.name ?? "",

@@ -1,11 +1,12 @@
 // context >> AuthContex
 // 로그인 및 로그아웃 토큰 저장 로직
 // useAuth 존재 
-import { createContext, useContext, useState, type PropsWithChildren } from "react";
+import { createContext, useContext, useState, useEffect, type PropsWithChildren } from "react";
 import type { RequestSigninDto } from "../types/auth";
 import { useLocalStorage } from "../hooks/useLocalStorage";
 import { LOCAL_STORAGE_KEY } from "../constants/key";
 import { postLogout, postSignin, deleteUser } from "../apis/auth";
+import { getMyProfile } from "../apis/user";
 
 interface AuthContextType {
   accessToken: string | null;
@@ -48,7 +49,21 @@ export const AuthPovider = ({ children }: PropsWithChildren) => {
   const [refreshToken, setRefreshToken] = useState<string | null>(
     getRefreshTokenFromStorage(),
   );
+
   const [userName, setUserName] = useState<string | null>(null);
+
+  // 사용자 이름 정보 저장
+  useEffect(() => {
+  if (!accessToken) return;
+
+  getMyProfile()
+    .then((me) => {
+      if (me?.data?.name) {
+        setUserName(me.data.name);
+      }
+    })
+    .catch(() => {});
+}, [accessToken]);
 
   // 로그인
   const login = async (signinData: RequestSigninDto) => {
@@ -67,8 +82,6 @@ export const AuthPovider = ({ children }: PropsWithChildren) => {
         setAccessToken(newAccessToken);
         setRefreshToken(newRefreshToken);
 
-        // 닉네임 저장
-        setUserName(userData.name || "익명"); 
 
         alert("로그인 성공");
         // 네비게이션 훅은 RouterProvider안에서만 사용이 가능하기에 이렇게 처리
@@ -88,10 +101,12 @@ export const AuthPovider = ({ children }: PropsWithChildren) => {
 
       removeAccessTokenFromStorage();
       removeRefreshTokenFromStorage();
+      
 
       setAccessToken(null);
       setRefreshToken(null);
-      setUserName(null);
+
+
 
       alert("로그아웃 성공");
     } catch (error) {
@@ -107,9 +122,11 @@ export const AuthPovider = ({ children }: PropsWithChildren) => {
 
       removeAccessTokenFromStorage();
       removeRefreshTokenFromStorage();
+      
+
       setAccessToken(null);
       setRefreshToken(null);
-      setUserName(null);
+
 
       alert("회원 탈퇴가 완료되었습니다.");
       window.location.href = "/login";

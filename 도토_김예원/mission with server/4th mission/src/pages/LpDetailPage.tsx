@@ -7,9 +7,13 @@ import {
 } from "@tanstack/react-query";
 import { getLpDetail } from "../apis/lps";
 import { getLpComments } from "../apis/comments";
-import { getMyInfo } from "../apis/auth";
+
 import { useCreateComment } from "../hooks/useCreateComment";
 import { LikeButton } from "../components/LikeButton";
+
+import { getMyProfile } from "../apis/user";
+import { useMyProfile } from "../hooks/useMyProfile";
+import { useLpDetail } from "../hooks/useLpDetail";
 
 interface Author {
   id: number;
@@ -29,7 +33,7 @@ interface CommentItem {
 }
 
 export default function LpDetailPage() {
-  const { lpid } = useParams();
+  // const { lpid } = useParams();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
 
@@ -38,55 +42,33 @@ export default function LpDetailPage() {
   const loadMoreRef = useRef<HTMLDivElement | null>(null);
   const commentTopRef = useRef<HTMLDivElement | null>(null);
   const [commentContent, setCommentContent] = useState("");
-  
 
-  // ✅ 유저 정보 불러오기
+
+  // 
+  // 코드 새로 작성하고 있숴요
+  // 
+  const { lpid } = useParams();
+
+  // 유저 정보 훅에서 불러오기
+  const { user, isLoading } = useMyProfile();
+
   useEffect(() => {
-    const token = localStorage.getItem("accessToken");
-    if (!token) return;
-    const fetchUser = async () => {
-      try {
-        const res = await getMyInfo();
-        setUserName(res.data.name);
-      } catch {
-        // 유저 정보 불러오기 실패 시 무시
-      }
-    };
-    fetchUser();
-  }, []);
+    if (user) {
+      setUserName(user.name);
+      setUserId(user.id);
+    }
+  }, [user]);
 
-  // ✅ LP 상세조회
+  // LP 상세조회 훅에서 부르기
   const {
     data: lpDetail,
     isLoading: isLpLoading,
     isError: isLpError,
-  } = useQuery({
-    queryKey: ["lpDetail", lpid],
-    queryFn: async () => {
-      const res = await getLpDetail(lpid!);
-      return res.data;
-    },
-    enabled: !!lpid,
-  });
- 
-  // ✅ 유저 정보 불러오기
-useEffect(() => {
-  const token = localStorage.getItem("accessToken");
-  if (!token) return;
-  const fetchUser = async () => {
-    try {
-      const res = await getMyInfo();
-      setUserName(res.data.name);
-      setUserId(res.data.id); // ✅ 추가
-    } catch {
-      // 유저 정보 불러오기 실패 시 무시
-    }
-  };
-  fetchUser();
-}, []);
+  } = useLpDetail(lpid);
 
-// ✅ userId 상태 추가
-const [userId, setUserId] = useState<number | null>(null);
+
+  // ✅ userId 상태 추가
+  const [userId, setUserId] = useState<number | null>(null);
 
   // ✅ 댓글 목록 무한스크롤
   const {
@@ -178,17 +160,17 @@ const [userId, setUserId] = useState<number | null>(null);
         {lpDetail.content}
       </p>
       {/* ✅ 좋아요 버튼 */}
-{lpDetail.likes && (
-  <div className="flex justify-end mb-4">
-    <LikeButton
-      lpId={Number(lpid)}
-      isLiked={lpDetail.likes.some((like: any) => like.userId === userId)}
-      likeCount={lpDetail.likes.length}
-      userId={userId!} // ✅ 로그인 유저 id 전달
-    />
-  </div>
-)}
-      
+      {lpDetail.likes && (
+        <div className="flex justify-end mb-4">
+          <LikeButton
+            lpId={Number(lpid)}
+            isLiked={lpDetail.likes.some((like: any) => like.userId === userId)}
+            likeCount={lpDetail.likes.length}
+            userId={userId!} // ✅ 로그인 유저 id 전달
+          />
+        </div>
+      )}
+
 
       {/* ===================== 댓글 영역 ===================== */}
       <div className="border-t border-gray-300 pt-6 mt-8">
@@ -197,21 +179,19 @@ const [userId, setUserId] = useState<number | null>(null);
           <div className="space-x-2">
             <button
               onClick={() => setOrder("oldest")}
-              className={`px-3 py-1 rounded ${
-                order === "oldest"
+              className={`px-3 py-1 rounded ${order === "oldest"
                   ? "bg-blue-500 text-white"
                   : "bg-gray-200 text-gray-700"
-              }`}
+                }`}
             >
               오래된순
             </button>
             <button
               onClick={() => setOrder("latest")}
-              className={`px-3 py-1 rounded ${
-                order === "latest"
+              className={`px-3 py-1 rounded ${order === "latest"
                   ? "bg-blue-500 text-white"
                   : "bg-gray-200 text-gray-700"
-              }`}
+                }`}
             >
               최신순
             </button>
@@ -230,50 +210,50 @@ const [userId, setUserId] = useState<number | null>(null);
             onClick={() => {
               if (!commentContent.trim()) return;
               createComment(commentContent, {
-  onSuccess: (newComment) => {
-    console.log("🟢 댓글 등록 성공:", newComment);
+                onSuccess: (newComment) => {
+                  console.log("🟢 댓글 등록 성공:", newComment);
 
-    // ✅ 서버 응답에서 받은 댓글 데이터
-    const newItem = newComment?.data ?? newComment;
+                  // ✅ 서버 응답에서 받은 댓글 데이터
+                  const newItem = newComment?.data ?? newComment;
 
-    // ✅ author 객체가 없으면 기본 작성자 정보 추가
-    const fixedComment = {
-      ...newItem,
-      author: {
-        id: newItem.authorId,
-        name: userName ?? "익명", // 현재 로그인한 사용자 이름
-        email: "", // 이메일 필요 없으면 빈 문자열
-      },
-    };
+                  // ✅ author 객체가 없으면 기본 작성자 정보 추가
+                  const fixedComment = {
+                    ...newItem,
+                    author: {
+                      id: newItem.authorId,
+                      name: userName ?? "익명", // 현재 로그인한 사용자 이름
+                      email: "", // 이메일 필요 없으면 빈 문자열
+                    },
+                  };
 
-    // ✅ 캐시에 바로 반영
-    queryClient.setQueryData(["lpComments", lpid, order], (oldData: any) => {
-      if (!oldData) return oldData;
+                  // ✅ 캐시에 바로 반영
+                  queryClient.setQueryData(["lpComments", lpid, order], (oldData: any) => {
+                    if (!oldData) return oldData;
 
-      return {
-        ...oldData,
-        pages: [
-          {
-            ...oldData.pages[0],
-            data: {
-              ...oldData.pages[0].data,
-              data: [fixedComment, ...(oldData.pages[0].data.data ?? [])],
-            },
-          },
-          ...oldData.pages.slice(1),
-        ],
-      };
-    });
+                    return {
+                      ...oldData,
+                      pages: [
+                        {
+                          ...oldData.pages[0],
+                          data: {
+                            ...oldData.pages[0].data,
+                            data: [fixedComment, ...(oldData.pages[0].data.data ?? [])],
+                          },
+                        },
+                        ...oldData.pages.slice(1),
+                      ],
+                    };
+                  });
 
-    setCommentContent("");
+                  setCommentContent("");
 
-    // ✅ 서버 새로고침 (안전하게 최신화)
-    queryClient.invalidateQueries({
-      queryKey: ["lpComments", lpid],
-      exact: false,
-    });
-  },
-});
+                  // ✅ 서버 새로고침 (안전하게 최신화)
+                  queryClient.invalidateQueries({
+                    queryKey: ["lpComments", lpid],
+                    exact: false,
+                  });
+                },
+              });
             }}
             disabled={isPending}
             className="bg-blue-600 hover:bg-blue-800 text-white px-4 py-2 rounded-md text-sm font-semibold disabled:opacity-50"

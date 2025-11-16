@@ -34,11 +34,6 @@ export const postLogout =async()=>{
 
 
 
-export const getMyInfo = async (): Promise<ResponseMyInfoDto> => {
-    const { data } = await axiosInstance.get("/v1/users/me",{});
-   
-    return data;
-};
 
 export const updateMyInfo = async (data: {
   name?: string;

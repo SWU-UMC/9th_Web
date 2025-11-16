@@ -18,13 +18,15 @@ const GoogleLoginRedirectPage = () => {
         const accessToken = urlParams.get(LOCAL_STORAGE_KEY.accessToken);
         const refreshToken = urlParams.get(LOCAL_STORAGE_KEY.refreshToken);
 
+
         // 토큰이 있는경우 즉 로그인을 성공한 경우 
         if (accessToken) {
             setAccessToken(accessToken);
             setRefreshToken(refreshToken);
+            
             window.location.href = "/my";
         }
-    }, [setAccessToken, setRefreshToken]);
+    }, [setAccessToken, setRefreshToken,]);
 
     return (
         <div>
