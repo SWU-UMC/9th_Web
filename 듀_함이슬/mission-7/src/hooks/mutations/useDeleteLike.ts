@@ -50,9 +50,7 @@ function useDeleteLike() {
 
         onError: (err, newLp, context) => {
             console.log(err, newLp);
-            queryClient.setQueryData([QUERY_KEY.lps, newLp.lpid],
-                context?.previousLpPost?.data.id,
-            );
+            queryClient.setQueryData([QUERY_KEY.lps, newLp.lpid], context?.previousLpPost);
         },
 
         // onSettled는 API 요청이 끝난 후 실행

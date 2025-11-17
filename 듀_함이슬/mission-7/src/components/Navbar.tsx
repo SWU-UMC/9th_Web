@@ -37,11 +37,8 @@ export const Navbar = () => {
         <>
             <div className="fixed top-0 w-full flex items-center z-50 gap-5 p-4 bg-gray-100">
                 <button onClick={toggle}
-                    className="px-1">
-                    {isOpen ?
-                        (<img src={"/images/burger.svg"} alt="burger image" className="w-6 h-6" />) :
-                        (<img src={"/images/burger.svg"} alt="burger image" className="w-6 h-6" />
-                        )}
+                    className="px-1 cursor-pointer">
+                    <img src={"/images/burger.svg"} alt="burger image" className="w-6 h-6" />
                 </button>
 
                 <NavLink to="/"

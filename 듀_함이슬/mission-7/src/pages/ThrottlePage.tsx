@@ -19,7 +19,7 @@ const ThrottlePage = () => {
     console.log("리렌더링");
 
     return (
-        <div className="h-dvh flex felx-col items-center justify-center">
+        <div className="h-dvh flex flex-col items-center justify-center">
             <div>
                 <h1>쓰로틀링이 무엇일까요?</h1>
                 <p>ScrollY: {scrollY}px</p>

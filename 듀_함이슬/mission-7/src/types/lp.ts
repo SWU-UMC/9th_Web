@@ -95,4 +95,4 @@ export type LpUpdateResponseDto = CommonResponse<{
     tags: Tag[];
 }>;
 
-export type LpDelteResoponseDto = CommonResponse<boolean>;
+export type LpDeleteResoponseDto = CommonResponse<boolean>;

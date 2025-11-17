@@ -45,13 +45,13 @@ export const AuthProvider = ({ children }: PropsWithChildren) => {
 
             if (data) {
                 const newAccessToken = data.accessToken;
-                const newRefreshTokne = data.refreshToken;
+                const newRefreshToken = data.refreshToken;
 
                 setAccessTokenInStorage(newAccessToken);
-                setRefreshTokenInStorage(newRefreshTokne);
+                setRefreshTokenInStorage(newRefreshToken);
 
                 setAccessToken(newAccessToken);
-                setRefreshToken(newRefreshTokne);
+                setRefreshToken(newRefreshToken);
                 alert("로그인 성공");
             }
 

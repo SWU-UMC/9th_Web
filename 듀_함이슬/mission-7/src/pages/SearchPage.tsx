@@ -1,5 +1,4 @@
-
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import useDebounce from "../hooks/useDebounce";
 import useGetInfiniteLpList from "../hooks/queries/useGetInfiniteLpList";
 import { PAGINATION_ORDER } from "../types/common";
@@ -7,6 +6,8 @@ import LoadingError from "../components/LoadingError";
 import LpCardSkeletonList from "../components/LpCard/LpCardSkeletonList";
 import LpCard from "../components/LpCard/LpCard";
 import { SEARCH_DEBOUNCE_DELAY } from "../constants/delay";
+import { useInView } from "react-intersection-observer";
+import useThrottle from "../hooks/useThrottle";
 
 
 const SearchPage = () => {
@@ -17,10 +18,23 @@ const SearchPage = () => {
     // 검색어 비어있는지 확인
     const isSearchEmpty = !debouncedValue.trim();
 
-    const { data: lps, isFetching, isPending, isError, refetch } =
+    const { data: lps, isFetching, isPending, isError, refetch, fetchNextPage, hasNextPage } =
         useGetInfiniteLpList(12, debouncedValue, order, {
             enabled: !isSearchEmpty,
         });
+
+    const { ref, inView } = useInView({
+        threshold: 0,
+    });
+
+    const throttlesInView = useThrottle(inView, 500);
+
+    useEffect(() => {
+        if (throttlesInView && !isFetching && hasNextPage) {
+            fetchNextPage();
+        }
+    }, [throttlesInView, isFetching, hasNextPage, fetchNextPage]);
+    
     return (
         <>
             <div>
@@ -41,6 +55,12 @@ const SearchPage = () => {
                             skeleton={<LpCardSkeletonList count={12} />}>
                             {lps?.pages?.map((page) => page.data.data)?.flat()?.map((lp) => <LpCard key={lp.id} lp={lp} />)}
                         </LoadingError>
+                    </div>
+                    <div ref={ref} className="h-2">
+                        {!isPending && isFetching && (<div className="p-5 gap-4 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6">
+                            <LpCardSkeletonList count={12} />
+                        </div>
+                        )}
                     </div>
                 </div>
             )}
