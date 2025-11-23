@@ -34,6 +34,17 @@ export const Sidebar = ({ isOpen }: SidebarProps) => {
             마이페이지
           </NavLink>
         </li>
+        <li>
+          <NavLink
+            to="/UseReducer"
+            className={({ isActive }) =>
+              `block px-3 py-2 rounded hover:bg-gray-200 ${isActive ? "bg-blue-100 text-blue-600" : ""
+              }`
+            }
+          >
+            UseRedeucer
+          </NavLink>
+        </li>
       </ul>
     </aside>
   );
