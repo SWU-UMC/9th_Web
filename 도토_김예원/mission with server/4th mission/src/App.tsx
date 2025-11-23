@@ -12,6 +12,7 @@ import GoogleLoginRedirectPage from "./pages/GoogleLoginRedirectPage";
 import LpDetailPage from "./pages/LpDetailPage";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import {ReactQueryDevtools} from "@tanstack/react-query-devtools";
+import ThrottlePage from "./pages/ThrottlePage";
 
 const queryClient = new QueryClient();
 
@@ -28,6 +29,7 @@ const publicRoutes: RouteObject[] = [
       { path: "signup", element: <SignupPage /> },
       // 구글 로그인 리다이렉 주소
       { path: "v1/auth/google/callback", element: <GoogleLoginRedirectPage /> },
+      { path: "throttle", element: <ThrottlePage/>},
     ],
   },
 ];

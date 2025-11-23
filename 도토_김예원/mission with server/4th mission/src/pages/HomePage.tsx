@@ -5,6 +5,8 @@ import type { LpItem } from "../types/lps";
 import LpWriteModal from "../components/LpWriteModal";
 import useGetLpList from "../hooks/queries/useGetLpList";
 import { useNavigate } from "react-router-dom";
+import useDebounce from "../hooks/useDebounce";
+import {SEARCH_DEBOUNCE_DELAY} from "../constants/delay";
 
 
 
@@ -135,15 +137,45 @@ import { useNavigate } from "react-router-dom";
 
 const HomePage = () => {
   const [search, setSearch] = useState("");
+
+  // debounce 처리
+  const debouncedValue= useDebounce(search,SEARCH_DEBOUNCE_DELAY);
+  const trimmed = debouncedValue.trim();
+
   const [order, setOrder] = useState<"asc" | "desc">("desc");
 
   // 페이지 이동
   const navigate = useNavigate();
 
-  const { data } = useGetLpList({
-    search,      // 검색어 전달
+  // 이렇게 작성하면 초기 화면에 데이터를 안 불러오는 오류 발생
+  // const { data } = useGetLpList({
+  //   //  검색어 전달
+  //   // search,     
+  //   // search: debouncedValue,
+  //   search: trimmed,
+  //   order,
+  //   // 비어 있으면 실행 안함
+  //   enabled: trimmed.length > 0,
+  // });
+
+  // 검색어가 있을 때 없을 때 2가지 경우로 나누어서 진행하는 방식으로 수정
+   // 검색어가 없을 때 >> 전체 목록 쿼리 실행
+  const { data: defaultList } = useGetLpList({
+    search: undefined,
     order,
+    enabled: trimmed.length === 0, 
   });
+
+  //  검색어가 있을 때 >> 검색된 목록 쿼리 실행
+  const { data: searchList } = useGetLpList({
+    search: trimmed,
+    order,
+    // 검색어가 있는데 공백인 경우 쿼리 실행 x
+    enabled: trimmed.length > 0,
+  });
+
+  // 어떤 목록을 보여줄지 결정
+  const list = trimmed.length > 0 ? searchList : defaultList;
 
   return (
     <div className="mt-10 mr-5 ml-5">
@@ -169,7 +201,7 @@ const HomePage = () => {
 
       {/* 목록 */}
       <div className="grid grid-cols-4 gap-4 mt-6">
-        {data?.map((lp) => (
+        {list?.map((lp) => (
           <div
             key={lp.id}
             onClick={() => navigate(`/lp/${lp.id}`)}
