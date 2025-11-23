@@ -3,7 +3,7 @@ import type { PaginationDto } from "../../types/common";
 import { QUERY_KEY } from "../../constants/key.ts";
 import { getLpList } from "../../apis/lp.ts";
 
-// useQuery를 이용하여 lp목록을 불러오는 부분을 훅으로 처리
+// useQuery를 이용하여 lp목록을 불러옴
 function useGetLpList({ cursor, search, order, limit, enabled }: PaginationDto) {
   return useQuery({
     queryKey: [QUERY_KEY.lps, search, order], // 옵션에 따라 key 변화

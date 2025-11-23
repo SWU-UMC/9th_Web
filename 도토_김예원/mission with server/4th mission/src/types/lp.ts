@@ -12,18 +12,16 @@ export type Likes={
     lpId: number;
 }
 
-export type ResponseLpListDto= CursorBasedResponse<{
-    data: 
-      {
-        id: number,
-        title: string,
-        content: string,
-        thumbnail: string,
-        published: boolean,
-        authorId: number,
-        createdAt: Date,
-        updatedAt: Date,
-        tages: Tag[];
-        likes: Likes[];
-      }[];
-}>;
+export type LpItem = {
+  id: number;
+  title: string;
+  content: string;
+  thumbnail: string;
+  published: boolean;
+  authorId: number;
+  createdAt: Date;
+  updatedAt: Date;
+  tags: Tag[];
+  likes: Likes[];
+};
+export type ResponseLpListDto = CursorBasedResponse<LpItem>;

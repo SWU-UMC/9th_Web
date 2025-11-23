@@ -4,10 +4,13 @@ import { useAuth } from "../context/AuthContext";
 import { Sidebar } from "../components/Sidebar";
 import { Navbar } from "../components/Navbar";
 import { useSidebar } from "../hooks/useSidebar";
+import { useLocation } from "react-router-dom";
 
 // 토큰이 없는 경우를 처리해주는 레이아웃 
 const ProtectedLayout = () => {
   const { accessToken } = useAuth();
+  const location = useLocation();
+  const pathname = location.pathname;  // ← 현재 페이지 경로
 
   // 훅으로 처리
   // const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -41,9 +44,17 @@ const ProtectedLayout = () => {
     };
   }, [isOpen]);
 
+  // 토큰이 없는 경우 로그인 페이지 연결 이전 경고창 보이기
+  // 현재 2번이 보이는건 개발자 모드여서 그럼
+  useEffect(() => {
+    if (!accessToken) {
+      alert("로그인이 필요한 서비스입니다.");
+    }
+  }, [accessToken]);
+
   // 토큰이 없는 경우 로그인 페이지로 연결
   if (!accessToken) {
-    return <Navigate to={"/login"} replace />;
+    return <Navigate to={"/login"} replace state={{ from: pathname }} />;
   }
 
   return (

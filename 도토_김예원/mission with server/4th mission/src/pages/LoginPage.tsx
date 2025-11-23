@@ -1,17 +1,19 @@
 import { validateSignin, type UserSigninInformation } from "../utils/validate";
 import useForm from "../hooks/useForm";
-import { useNavigate } from "react-router-dom";
+import {useLocation, useNavigate } from "react-router-dom";
 import { IoIosArrowBack } from "react-icons/io";
 import { useAuth } from "../context/AuthContext";
 import { useMutation } from "@tanstack/react-query";
 
 const LoginPage = () => {
   const navigate = useNavigate();
+  // 로그인 후 리다이렉 페이지를 위함
+  const location = useLocation();
+  const from = location.state?.from || "/my"; 
+
   const { login } = useAuth();
   // 로그인이 된 상태일 떄 accessToken이 있는 상태에서 로그인 페이지로 말고 홈으로 연결되도록
   // uesEffect 사용
-
-
   const { values, errors, touched, getInputProps } =
     useForm<UserSigninInformation>({
       initialValue: { email: "", password: "" },
@@ -23,7 +25,7 @@ const LoginPage = () => {
     mutationFn: async () => await login(values),
     onSuccess: () => {
       alert("로그인 성공!");
-      navigate("/my");
+      navigate(from, { replace: true });
     },
     onError: (error) => {
       console.error("로그인 실패:", error);

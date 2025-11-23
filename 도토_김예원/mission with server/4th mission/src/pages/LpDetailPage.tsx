@@ -1,314 +1,244 @@
-import { useParams, useNavigate } from "react-router-dom";
-import { useEffect, useState, useRef } from "react";
-import {
-  useInfiniteQuery,
-  useQuery,
-  useQueryClient,
-} from "@tanstack/react-query";
-import { getLpDetail } from "../apis/lps";
-import { getLpComments } from "../apis/comments";
-
+import { useParams } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { useMyProfile } from "../hooks/queries/useMyProfile";
+import { useLpDetail } from "../hooks/queries/useLpDetail";
+import { useLpComments } from "../hooks/queries/useLpComments";
 import { useCreateComment } from "../hooks/useCreateComment";
-import { LikeButton } from "../components/LikeButton";
+import LoadingPage from "./LoadingPage";
+import ErrorPage from "../pages/ErrorPage";
+import { Comment } from "../components/Comment/Comment";
+import { CommentSkeleton } from "../components/Comment/CommentSkeleton";
+import { useLpCommentsInfinite } from "../hooks/queries/useLpCommentsInfinite";
+import { useInView } from "react-intersection-observer";
 
-import { getMyProfile } from "../apis/user";
-import { useMyProfile } from "../hooks/useMyProfile";
-import { useLpDetail } from "../hooks/useLpDetail";
+export default function NewLpDetailPage() {
+  const { lpid } = useParams<{ lpid: string }>();
 
-interface Author {
-  id: number;
-  name: string;
-  email: string;
-  avatar?: string | null;
-}
+  // 사용자 정보 불러오기
+  const { user } = useMyProfile();
+  const userName = user?.name ?? "";
 
-interface CommentItem {
-  id: number;
-  content: string;
-  lpId: number;
-  authorId: number;
-  createdAt: string;
-  updatedAt: string;
-  author: Author;
-}
+  // 최신, 오래된 순
+  const [order, setOrder] = useState<"asc" | "desc">("desc");
 
-export default function LpDetailPage() {
-  // const { lpid } = useParams();
-  const navigate = useNavigate();
-  const queryClient = useQueryClient();
-
-  const [userName, setUserName] = useState<string | null>(null);
-  const [order, setOrder] = useState<"latest" | "oldest">("latest");
-  const loadMoreRef = useRef<HTMLDivElement | null>(null);
-  const commentTopRef = useRef<HTMLDivElement | null>(null);
-  const [commentContent, setCommentContent] = useState("");
-
-
-  // 
-  // 코드 새로 작성하고 있숴요
-  // 
-  const { lpid } = useParams();
-
-  // 유저 정보 훅에서 불러오기
-  const { user, isLoading } = useMyProfile();
-
-  useEffect(() => {
-    if (user) {
-      setUserName(user.name);
-      setUserId(user.id);
-    }
-  }, [user]);
-
-  // LP 상세조회 훅에서 부르기
+  // LP 상세 정보 가져오기
   const {
     data: lpDetail,
     isLoading: isLpLoading,
     isError: isLpError,
   } = useLpDetail(lpid);
 
+  // 
+  // useQuery를 이용한 부분 
+  // 
+  // 댓글들 불러오기
+  // const {
+  //   data: commentList,
+  //   refetch: refetchComments,
+  //   isLoading: isCommentLoading,
+  //   isError: isCommentError,
+  // } = useLpComments(lpid, order);
 
-  // ✅ userId 상태 추가
-  const [userId, setUserId] = useState<number | null>(null);
-
-  // ✅ 댓글 목록 무한스크롤
+  // useInfitniteQuery를 이용한 부분
   const {
-    data: commentPages,
+    data,
     fetchNextPage,
     hasNextPage,
     isFetchingNextPage,
     isLoading: isCommentLoading,
-  } = useInfiniteQuery({
-    queryKey: ["lpComments", lpid, order],
-    queryFn: ({ pageParam = 1 }) =>
-      getLpComments({ pageParam, lpId: lpid!, order }),
-    getNextPageParam: (lastPage) =>
-      lastPage?.data?.hasNext ? lastPage.data.nextCursor : undefined,
-    initialPageParam: 1,
-    enabled: !!lpid,
-  });
+    isError: isCommentError,
+  } = useLpCommentsInfinite(lpid!, order);
 
-  // ✅ 댓글 작성 Mutation
-  const { mutate: createComment, isPending } = useCreateComment(lpid!);
+  // 무한 스크롤 트리거
+  const { ref, inView } = useInView();
 
-  // ✅ 무한스크롤 감시
   useEffect(() => {
-    if (!hasNextPage || isFetchingNextPage) return;
-    const observer = new IntersectionObserver(
-      (entries) => {
-        if (entries[0].isIntersecting) {
-          fetchNextPage();
-        }
+    if (inView && hasNextPage) {
+      fetchNextPage();
+    }
+  }, [inView, hasNextPage, fetchNextPage]);
+
+  // 
+  // 댓글 작성
+  // 여기는 이따가
+  // 
+  const { mutate: createComment, isPending } = useCreateComment(lpid!);
+  const [commentContent, setCommentContent] = useState("");
+
+  const handleSubmitComment = () => {
+    if (!userName) {
+      alert("로그인이 필요합니다.");
+      return;
+    }
+
+    if (!commentContent.trim()) return;
+
+    createComment(commentContent, {
+      onSuccess: () => {
+        setCommentContent("");
+        // refetchComments();
       },
-      { threshold: 1 }
-    );
-    if (loadMoreRef.current) observer.observe(loadMoreRef.current);
-    return () => {
-      if (loadMoreRef.current) observer.unobserve(loadMoreRef.current);
-    };
-  }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
+    });
+  };
 
-  // ✅ 댓글 로딩 시 스켈레톤
-  const CommentSkeleton = () => (
-    <div className="flex items-start gap-3 border-b border-gray-200 pb-3 animate-pulse">
-      <div className="w-9 h-9 bg-gray-300 rounded-full" />
-      <div className="flex-1 space-y-2">
-        <div className="w-1/4 h-4 bg-gray-300 rounded"></div>
-        <div className="w-3/4 h-3 bg-gray-200 rounded"></div>
-        <div className="w-2/3 h-3 bg-gray-200 rounded"></div>
-      </div>
-    </div>
-  );
+  // 로딩 및 에러 처리 _ LP 상세만 고려
+  if (isLpLoading) return <LoadingPage />;
+  if (isLpError) return <ErrorPage />;
 
-  if (isLpLoading)
-    return (
-      <div className="flex justify-center items-center h-[60vh] text-gray-500">
-        불러오는 중...
-      </div>
-    );
-  if (isLpError || !lpDetail)
-    return (
-      <div className="text-center text-gray-500 py-20">
-        데이터를 불러올 수 없습니다.
-      </div>
-    );
+
 
   return (
     <div className="max-w-4xl mx-auto bg-white rounded-2xl shadow-md p-8 mt-8">
-      {/* ===================== LP 상세 정보 ===================== */}
+
+      {/* LP 상세 정보  */}
       <div className="flex justify-between items-center mb-4">
-        <span className="text-gray-700 font-semibold">
-          {userName ?? "로그인 필요"}
+        {/* 사용자 이름 */}
+        <span className="text-gray-600 ">
+          {userName || "로그인 필요"}
         </span>
+        {/* 게시 날짜 */}
         <span className="text-gray-400 text-sm">
           {lpDetail.createdAt?.slice(0, 10)}
         </span>
       </div>
 
+      {/* lp 제목 */}
       <h1 className="text-2xl font-bold text-gray-900 mb-6">
         {lpDetail.title}
       </h1>
 
-      {lpDetail.thumbnail && (
-        <img
-          src={lpDetail.thumbnail}
-          alt={lpDetail.title}
-          className="w-full rounded-lg shadow-md mb-6 object-contain max-h-[600px]"
-        />
-      )}
+      {/* 썸네일 lp판처럼 보이도록 */}
+      <div className="flex justify-center my-8 ">
+        <div className="relative w-[300px] h-[300px] rounded-full bg-black shadow-lg overflow-hidden">
 
-      <p className="text-gray-700 leading-relaxed whitespace-pre-line">
+          {/* LP Thumbnail 이미지 */}
+          <img
+            src={lpDetail.thumbnail}
+            alt="LP Thumbnail"
+            className="absolute inset-0 w-full h-full object-cover"
+          />
+
+          {/* 중앙 CD 구멍 */}
+          <div className="absolute top-1/2 left-1/2 w-14 h-14 bg-white rounded-full shadow-inner -translate-x-1/2 -translate-y-1/2" />
+        </div>
+      </div>
+
+      <p className="text-gray-700 leading-relaxed whitespace-pre-line mb-10 line-clamp-3">
         {lpDetail.content}
       </p>
-      {/* ✅ 좋아요 버튼 */}
-      {lpDetail.likes && (
-        <div className="flex justify-end mb-4">
-          <LikeButton
-            lpId={Number(lpid)}
-            isLiked={lpDetail.likes.some((like: any) => like.userId === userId)}
-            likeCount={lpDetail.likes.length}
-            userId={userId!} // ✅ 로그인 유저 id 전달
-          />
+
+      {/* ===================== 좋아요 버튼 ===================== */}
+      <div className="flex justify-end mb-8">
+        <button
+          onClick={async () => {
+            try {
+              const res = await fetch(
+                `${import.meta.env.VITE_SERVER_API_URL}/lps/${lpid}/like`,
+                {
+                  method: "POST",
+                  credentials: "include", // 토큰 쿠키 기반이면 필요
+                  headers: {
+                    "Content-Type": "application/json",
+                  },
+                }
+              );
+
+              const data = await res.json();
+              if (!res.ok) {
+                alert("좋아요 요청 실패");
+                return;
+              }
+
+              // 성공 시 화면에서 즉시 반영
+              // lpDetail likes를 직접 수정해야 함
+              lpDetail.likes = data.data.likes;
+
+
+            } catch (e) {
+              console.error(e);
+            }
+          }}
+          className="flex items-center gap-1 bg-white border border-gray-300 hover:bg-gray-100 px-3 py-1 rounded-md"
+        >
+          ❤️ {lpDetail.likes.length}
+        </button>
+      </div>
+
+      {/* 댓글 영역 */}
+      <div className="border-t border-gray-300 pt-6">
+        <h2 className="font-semibold text-gray-800 mb-4">댓글</h2>
+
+        {/* 최신, 오래된 순 선택 버튼  */}
+        <div className="flex items-center gap-3 mb-4 text-sm">
+          <button
+            className={`px-3 py-1 rounded-md border ${order === "desc" ? "bg-blue-600 text-white border-blue-600" : "border-gray-300"
+              }`}
+            onClick={() => setOrder("desc")}
+          >
+            최신순
+          </button>
+
+          <button
+            className={`px-3 py-1 rounded-md border ${order === "asc" ? "bg-blue-600 text-white border-blue-600" : "border-gray-300"
+              }`}
+            onClick={() => setOrder("asc")}
+          >
+            오래된순
+          </button>
         </div>
-      )}
 
-
-      {/* ===================== 댓글 영역 ===================== */}
-      <div className="border-t border-gray-300 pt-6 mt-8">
-        <div className="flex justify-between items-center mb-4">
-          <h2 className="font-semibold text-gray-800">댓글</h2>
-          <div className="space-x-2">
-            <button
-              onClick={() => setOrder("oldest")}
-              className={`px-3 py-1 rounded ${order === "oldest"
-                  ? "bg-blue-500 text-white"
-                  : "bg-gray-200 text-gray-700"
-                }`}
-            >
-              오래된순
-            </button>
-            <button
-              onClick={() => setOrder("latest")}
-              className={`px-3 py-1 rounded ${order === "latest"
-                  ? "bg-blue-500 text-white"
-                  : "bg-gray-200 text-gray-700"
-                }`}
-            >
-              최신순
-            </button>
-          </div>
-        </div>
-
-        {/* ✅ 댓글 입력창 */}
-        <div ref={commentTopRef} className="mb-5 flex items-center gap-2">
+        {/* 댓글 입력 */}
+        <div className="flex items-center gap-4 mb-6">
           <input
             value={commentContent}
             onChange={(e) => setCommentContent(e.target.value)}
             placeholder="댓글을 입력하세요"
-            className="flex-1 border rounded-md px-3 py-2 text-sm text-gray-800"
+            className="flex-1 border rounded-md px-3 py-2 text-sm"
           />
+
           <button
-            onClick={() => {
-              if (!commentContent.trim()) return;
-              createComment(commentContent, {
-                onSuccess: (newComment) => {
-                  console.log("🟢 댓글 등록 성공:", newComment);
-
-                  // ✅ 서버 응답에서 받은 댓글 데이터
-                  const newItem = newComment?.data ?? newComment;
-
-                  // ✅ author 객체가 없으면 기본 작성자 정보 추가
-                  const fixedComment = {
-                    ...newItem,
-                    author: {
-                      id: newItem.authorId,
-                      name: userName ?? "익명", // 현재 로그인한 사용자 이름
-                      email: "", // 이메일 필요 없으면 빈 문자열
-                    },
-                  };
-
-                  // ✅ 캐시에 바로 반영
-                  queryClient.setQueryData(["lpComments", lpid, order], (oldData: any) => {
-                    if (!oldData) return oldData;
-
-                    return {
-                      ...oldData,
-                      pages: [
-                        {
-                          ...oldData.pages[0],
-                          data: {
-                            ...oldData.pages[0].data,
-                            data: [fixedComment, ...(oldData.pages[0].data.data ?? [])],
-                          },
-                        },
-                        ...oldData.pages.slice(1),
-                      ],
-                    };
-                  });
-
-                  setCommentContent("");
-
-                  // ✅ 서버 새로고침 (안전하게 최신화)
-                  queryClient.invalidateQueries({
-                    queryKey: ["lpComments", lpid],
-                    exact: false,
-                  });
-                },
-              });
-            }}
+            onClick={handleSubmitComment}
             disabled={isPending}
             className="bg-blue-600 hover:bg-blue-800 text-white px-4 py-2 rounded-md text-sm font-semibold disabled:opacity-50"
           >
-            {isPending ? "등록 중..." : "등록"}
+            등록
           </button>
         </div>
 
-        {/* ✅ 댓글 목록 */}
+        {/* 댓글 목록 */}
         {isCommentLoading ? (
-          <>
-            {Array.from({ length: 5 }).map((_, idx) => (
-              <CommentSkeleton key={idx} />
+          <div className="flex flex-col gap-4">
+            {Array.from({ length: 5 }).map((_, i) => (
+              <CommentSkeleton key={i} />
             ))}
-          </>
+          </div>
         ) : (
-          <ul className="flex flex-col gap-4">
-            {commentPages?.pages?.map((page, pageIndex) =>
-              page?.data?.data?.map((c: CommentItem) => (
-                <li
-                  key={`${pageIndex}-${c.id}`}
-                  className="flex items-start gap-3 border-b border-gray-200 pb-3"
-                >
-                  <div className="flex items-center justify-center w-9 h-9 rounded-full bg-gray-600 text-white font-semibold">
-                    {c.author?.name?.charAt(0).toUpperCase() ?? "?"}
-                  </div>
-                  <div className="flex-1">
-                    <div className="flex items-center justify-between">
-                      <div className="text-sm font-semibold text-gray-900">
-                        {c.author?.name ?? "익명"}
-                      </div>
-                      <div className="text-xs text-gray-500">
-                        {new Date(c.createdAt).toLocaleString("ko-KR", {
-                          month: "2-digit",
-                          day: "2-digit",
-                          hour: "2-digit",
-                          minute: "2-digit",
-                        })}
-                      </div>
-                    </div>
-                    <p className="text-sm text-gray-600 mt-1 whitespace-pre-line">
-                      {c.content}
-                    </p>
-                  </div>
-                </li>
-              ))
+          <>
+            {/* useQuery를 이용한 부분 */}
+            {/* <Comment comments={commentList ?? []} /> */}
+
+            {/* useInfinitQuery를 이용한 부분 */}
+            {data?.pages?.map((page, i) => (
+              <Comment
+                key={i}
+                comments={page.data.data} // 댓글 리스트
+              />
+            ))}
+
+            {/* 관찰용 div_이 div가 화면에 보이면 다음 부분 로드 */}
+            <div ref={ref} className="h-10"></div>
+
+            {/* 다음 페이지 불러오는 중_스켈레톤 UI */}
+            {isFetchingNextPage && (
+              <div className="flex flex-col gap-4">
+                {Array.from({ length: 3 }).map((_, i) => (
+                  <CommentSkeleton key={i} />
+                ))}
+              </div>
             )}
-            {isFetchingNextPage &&
-              Array.from({ length: 3 }).map((_, idx) => (
-                <CommentSkeleton key={`loading-${idx}`} />
-              ))}
-          </ul>
+          </>
         )}
 
-        <div ref={loadMoreRef} className="h-8" />
       </div>
     </div>
   );
