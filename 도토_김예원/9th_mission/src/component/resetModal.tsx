@@ -1,10 +1,10 @@
-import { useDispatch, useSelector } from "../hooks/useCustomRedux";
-import { closeModal } from "../slices/modalSlice";
-import { clearCart } from "../slices/cartSlice";
+import { useModalInfo, useModalActions } from "../hooks/useModalStore";
+import { useCartActions } from "../hooks/useCardStore";
 
 const resetModal = () => {
-    const dispatch = useDispatch();
-    const isOpen = useSelector((state)=> state.modal.isOpen);
+    const { isOpen } = useModalInfo();           // 모달 열림 여부 확인
+    const { closeModal } = useModalActions();    // 모달 닫기 액션
+    const { clearCart } = useCartActions();
 
     if (!isOpen) return null;
 
@@ -18,7 +18,7 @@ const resetModal = () => {
                 <div className="flex justify-center gap-6">
                     <button
                         className="px-4 py-2 rounded-md bg-gray-200 text-gray-800"
-                        onClick={() => dispatch(closeModal())}
+                        onClick={()=>closeModal()}
                     >
                         아니요
                     </button>
@@ -26,8 +26,8 @@ const resetModal = () => {
                     <button
                         className="px-7 py-2 rounded-md bg-red-500 text-white"
                         onClick={() => {
-                            dispatch(clearCart());
-                            dispatch(closeModal());
+                            clearCart();
+                            closeModal();
                         }}
                     >
                         네

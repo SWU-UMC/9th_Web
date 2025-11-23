@@ -1,6 +1,5 @@
 import type { Lp } from "../type/cart"
-import { useDispatch } from "../hooks/useCustomRedux";
-import { decrease, increase, removeItem } from "../slices/cartSlice";
+import { useCartActions } from "../hooks/useCardStore";
 
 // 장바구니 목록 1개 컴포넌트
 interface CartItemProps {
@@ -8,20 +7,19 @@ interface CartItemProps {
 }
 
 const CartItem = ({ lp }: CartItemProps) => {
-    const dispatch = useDispatch();
+    const { increase, decrease, removeItem } = useCartActions();
 
     const handleIncreaseCount = () => {
-        dispatch(increase({ id: lp.id }));
-    }
+        increase(lp.id);
+    };
 
     const handleDecreaseCount = () => {
-        if(lp.amount ===1){
-            dispatch(removeItem({id:lp.id}));
+        if (lp.amount === 1) {
+            removeItem(lp.id);
             return;
         }
-
-        dispatch(decrease({id: lp.id}));
-    }
+        decrease(lp.id);
+    };
 
     return (
         <div className="flex items-center p-4 border-b border-gray-300">

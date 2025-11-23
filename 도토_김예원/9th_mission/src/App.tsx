@@ -12,13 +12,12 @@ import ResetModal from "./component/resetModal";
 function App() {
 
   return (
-    <Provider store={store}>
-      <ResetModal/>
+    <>
+      <ResetModal />
       <Navbar />
       <CartList />
       <PriceBox />
-    </Provider>
-
+    </>
   );
 }
 

@@ -1,17 +1,15 @@
 import { IoCart } from "react-icons/io5";
-import { useDispatch, useSelector } from "../hooks/useCustomRedux";
 import { useEffect } from "react";
-import { calculateTotals } from "../slices/cartSlice";
-import cartItems from "../constants/cartItems";
+import { useCartActions, useCartInfo } from "../hooks/useCardStore";
 
 // 네비바
 const Navbar = () => {
-    const { amount } = useSelector((state)=>state.cart);
-    const dispatch = useDispatch();
+    const { amount, cartItems } = useCartInfo();
+    const { calculateTotals } = useCartActions();
 
-    useEffect(() =>{
-        dispatch(calculateTotals());
-    });
+    useEffect(() => {
+        calculateTotals();
+    }, [cartItems, calculateTotals]);
 
     return (
         <div className="flex justify-between items-center px-10 py-4 bg-gray-800 text-white">

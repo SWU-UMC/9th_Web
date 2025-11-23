@@ -1,22 +1,15 @@
-import { useDispatch, useSelector } from "../hooks/useCustomRedux";
-// import { clearCart } from "../slices/cartSlice";
-import { openModal } from "../slices/modalSlice";
+import { useCartInfo } from "../hooks/useCardStore";
+import { useModalActions } from "../hooks/useModalStore";
 
 // 가격 및 초기화 컴포넌트
 const PriceBox = () => {
-    const { total } = useSelector((state)=>state.cart);
-    const dispatch =useDispatch();
-
-    const handleInitializeCart =()=>{
-        // dispatch(clearCart());
-        // 모달이 나타나도록
-        dispatch(openModal());
-    };
+    const { total } = useCartInfo();
+    const { openModal } = useModalActions();
 
     return (
         <div className="px-60 py-4 flex items-center justify-between">
             <button
-                onClick={handleInitializeCart}
+                onClick={openModal}
                 className="bg-gray-800 text-white px-4 py-3 rounded-md cursor-pointer"
             >
                 장바구니 초기화

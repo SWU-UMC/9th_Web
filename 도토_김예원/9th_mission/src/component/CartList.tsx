@@ -1,10 +1,9 @@
-import cartItems from "../constants/cartItems";
 import CartItem from "./CartItem";
-import { useSelector } from "../hooks/useCustomRedux";
+import { useCartInfo } from "../hooks/useCardStore";
 
 // 장바구니 목록 list 컴포넌트
 const CartList = () => {
-    const { cartItems } = useSelector((state)=>state.cart);
+    const { cartItems } = useCartInfo();
 
     return (
         <div className="flex flex-col items-center justiy-center">
