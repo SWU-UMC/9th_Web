@@ -7,11 +7,13 @@ import CartList from "./component/CartList";
 import { Provider } from 'react-redux';
 import store from './store/store';
 import PriceBox from './component/PriceBox';
+import ResetModal from "./component/resetModal";
 
 function App() {
 
   return (
     <Provider store={store}>
+      <ResetModal/>
       <Navbar />
       <CartList />
       <PriceBox />

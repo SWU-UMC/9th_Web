@@ -1,5 +1,6 @@
 import { useDispatch, useSelector } from "../hooks/useCustomRedux";
-import { clearCart } from "../slices/cartSlice";
+// import { clearCart } from "../slices/cartSlice";
+import { openModal } from "../slices/modalSlice";
 
 // 가격 및 초기화 컴포넌트
 const PriceBox = () => {
@@ -7,7 +8,9 @@ const PriceBox = () => {
     const dispatch =useDispatch();
 
     const handleInitializeCart =()=>{
-        dispatch(clearCart());
+        // dispatch(clearCart());
+        // 모달이 나타나도록
+        dispatch(openModal());
     };
 
     return (
