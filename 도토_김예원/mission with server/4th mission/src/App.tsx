@@ -1,7 +1,6 @@
 import { createBrowserRouter, RouterProvider, type RouteObject } from "react-router-dom";
 import "./App.css";
 import HomePage from "./pages/HomePage";
-import NotFoundPage from "./pages/NotFoundPage";
 import LoginPage from "./pages/LoginPage";
 import HomeLayout from "./layout/HomeLayout";
 import SignupPage from "./pages/SignupPage";
@@ -13,6 +12,7 @@ import LpDetailPage from "./pages/LpDetailPage";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import {ReactQueryDevtools} from "@tanstack/react-query-devtools";
 import ThrottlePage from "./pages/ThrottlePage";
+import ErrorPage from "./pages/ErrorPage";
 
 const queryClient = new QueryClient();
 
@@ -22,7 +22,7 @@ const publicRoutes: RouteObject[] = [
   {
     path: "/",
     element: <HomeLayout />,
-    errorElement: <NotFoundPage />,
+    errorElement: <ErrorPage />,
     children: [
       { index: true, element: <HomePage /> },
       { path: "login", element: <LoginPage /> },
@@ -40,7 +40,7 @@ const protectedRoutes: RouteObject[] = [
   {
     path: "/",
     element: <ProtectedLayout />,
-    errorElement: <NotFoundPage />,
+    errorElement: <ErrorPage />,
     children: [
       { path: "my", element: <Mypage /> },
       { path: "lp/:lpid", element: <LpDetailPage /> },
