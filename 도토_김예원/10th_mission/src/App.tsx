@@ -1,15 +1,16 @@
 import './App.css'
-import UseCallBackPage from './pages/UseCallbackPage';
-import UseMemoPage from './pages/UseMemoPage';
+import HomePage from './pages/HomePage';
+// import UseCallBackPage from './pages/UseCallbackPage';
+// import UseMemoPage from './pages/UseMemoPage';
 
 function App() {
 
   return (
-    <main className='flex flex-col justify-center items-center h-dvh'>
-      {/* <UseCallBackPage /> */}
-      <UseMemoPage />
-    </main>
-  )
+    <div className='flex flex-col justify-center items-center'>
+      <HomePage />
+    </div>
+
+  );
 }
 
 export default App
