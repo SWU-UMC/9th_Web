@@ -1,3 +1,4 @@
+import { memo } from "react";
 import { useAuth } from "../../context/AuthContext";
 import type { Lp } from "../../types/lp";
 import { Link, useNavigate } from "react-router-dom";
@@ -6,7 +7,7 @@ interface LpCardProps {
     lp: Lp;
 }
 
-export default function LpCard({ lp }: LpCardProps) {
+function LpCard({ lp }: LpCardProps) {
 
     const uploadDate = new Date(lp.createdAt).toLocaleDateString('ko-KR');
     const likesCount = lp.likes.length;
@@ -51,3 +52,5 @@ export default function LpCard({ lp }: LpCardProps) {
         </Link>
     );
 }
+
+export default memo(LpCard);

@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { PAGINATION_ORDER } from "../types/common";
 import useGetInfiniteLpList from "../hooks/queries/useGetInfiniteLpList";
 import { useInView } from "react-intersection-observer";
@@ -28,13 +28,22 @@ const HomePage = () => {
         }
     }, [throttlesInView, isFetching, hasNextPage, fetchNextPage]);
 
+    // 데이터 바뀔 때만 연산하게끔 최적화
+    const flatLps = useMemo(() => {
+        return lps?.pages?.map((page) => page.data.data)?.flat() || [];
+    }, [lps]);
+
+    // 함수 재생성 방지
+    const handleOrderAsc = useCallback(() => setOrder(PAGINATION_ORDER.asc), []);
+    const handleOrderDesc = useCallback(() => setOrder(PAGINATION_ORDER.desc), []);
+
     return (
         <>
             <div className="mb-4 flex items-center justify-end gap-2">
-                <button onClick={() => setOrder(PAGINATION_ORDER.asc)}
+                <button onClick={handleOrderAsc}
                     className={`px-4 py-1 rounded-md cursor-pointer
                     ${order === PAGINATION_ORDER.asc ? 'bg-black text-white' : 'bg-white text-black'}`}>오래된순</button>
-                <button onClick={() => setOrder(PAGINATION_ORDER.desc)}
+                <button onClick={handleOrderDesc}
                     className={`px-4 py-1 rounded-md cursor-pointer
                     ${order === PAGINATION_ORDER.desc ? 'bg-black text-white' : 'bg-white text-black'}`}>최신순</button>
             </div>
@@ -46,7 +55,7 @@ const HomePage = () => {
                         isFetching={isFetching}
                         refetch={refetch}
                         skeleton={<LpCardSkeletonList count={20} />}>
-                        {lps?.pages?.map((page) => page.data.data)?.flat()?.map((lp) => <LpCard key={lp.id} lp={lp} />)}
+                        {flatLps.map((lp) => <LpCard key={lp.id} lp={lp} />)}
                     </LoadingError>
                 </div>
             </div>
