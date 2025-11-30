@@ -1,4 +1,4 @@
-import { memo } from "react";
+// import { memo } from "react";
 
 interface ITextInput {
     onchange: (text: string)=> void;
@@ -16,4 +16,4 @@ const TextInput= ({onchange}: ITextInput)=>{
     );
 };
 
-export default memo(TextInput);
+export default TextInput;
