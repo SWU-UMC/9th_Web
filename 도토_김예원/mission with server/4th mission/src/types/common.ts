@@ -11,10 +11,13 @@ export type CursorBasedResponse<T>={
     status: boolean;
     statusCode: number;
     message: string;
-    data: T;
+    data:{
+        data: T[];
     nextCursor: number;
     hasNext: boolean;
+    };
 }
+
 
 export type PaginationDto={
     cursor?: number;
