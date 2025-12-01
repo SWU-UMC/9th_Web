@@ -23,7 +23,7 @@ export type Movie = {
     vote_count: number;
 };
 
-export type MovieRespose = {
+export type MovieResponse = {
     page: number;
     results: Movie[];
     total_pages: number;

@@ -1,8 +1,8 @@
-import { useCallback, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import MovieFilter from "../components/MovieFilter";
 import MovieList from "../components/MovieList";
 import useFetch from "../hooks/useFetch";
-import type { MovieFilters, MovieRespose } from "../types/movie";
+import type { MovieFilters, MovieResponse } from "../types/movie";
 
 export default function HomePage() {
     const [filters, setFilters] = useState<MovieFilters>({
@@ -18,17 +18,12 @@ export default function HomePage() {
         [filters]
     );
 
-    const { data, error, isLoading } = useFetch<MovieRespose>(
+    const { data, error, isLoading } = useFetch<MovieResponse>(
         "/search/movie",
         axiosRequestConfig
     );
 
-    const handleMovieFilters = useCallback(
-        (filters: MovieFilters) => {
-            setFilters(filters);
-        },
-        [setFilters],
-    );
+    const handleMovieFilters = (filters: MovieFilters) => setFilters(filters);
 
     if (error) {
         return <div>{error}</div>;

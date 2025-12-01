@@ -20,7 +20,7 @@ export const SelectBox = ({
                 id={id}
                 checked={checked}
                 onChange={(e) => onChange(e.target.checked)}
-                className="size-4 rounded border-gray-300 bg-gray-200 text-blue-600 focus:ring-1 focus:ring-blue-500 cursor-pointer"
+                className="w-4 h-4 rounded border-gray-300 bg-gray-200 text-blue-600 focus:ring-1 focus:ring-blue-500 cursor-pointer"
             />
             <label htmlFor={id} className="ml-2 text-gray-700 cursor-pointer">
                 {label}
