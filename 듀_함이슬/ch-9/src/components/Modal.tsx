@@ -15,8 +15,14 @@ const Modal = () => {
     };
 
     return (
-        <div className="fixed inset-0 bg-black/50 flex justify-center items-center">
-            <div className="bg-white p-6 rounded-sm">
+        <div
+            className="fixed inset-0 bg-black/50 flex justify-center items-center"
+            onClick={closeModal}
+        >
+            <div
+                className="bg-white p-6 rounded-sm"
+                onClick={(e) => e.stopPropagation()}
+            >
                 <p className="font-bold">정말 삭제하시겠습니까?</p>
                 <div className="flex justify-center gap-5 mt-4">
                     <button
