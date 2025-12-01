@@ -1,5 +1,5 @@
 import { memo, useState } from "react";
-import { type Movielanguage, type Movie, type MovieFilters } from "../types/movie";
+import { type Movielanguage, type MovieFilters } from "../types/movie";
 import { Input } from '../components/Input';
 import { SelectBox } from "./SelectBox";
 import LanguageSelector from "./LanguageSelector";
