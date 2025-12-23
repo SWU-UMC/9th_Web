@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import useDebounce from "../hooks/useDebounce";
 import useGetInfiniteLpList from "../hooks/queries/useGetInfiniteLpList";
 import { PAGINATION_ORDER } from "../types/common";
@@ -34,6 +34,11 @@ const SearchPage = () => {
             fetchNextPage();
         }
     }, [throttlesInView, isFetching, hasNextPage, fetchNextPage]);
+
+    // 검색어 입력 최적화
+    const flatLps = useMemo(() => {
+        return lps?.pages?.map((page) => page.data.data)?.flat() || [];
+    }, [lps]);
     
     return (
         <>
@@ -53,7 +58,7 @@ const SearchPage = () => {
                             isFetching={isFetching}
                             refetch={refetch}
                             skeleton={<LpCardSkeletonList count={12} />}>
-                            {lps?.pages?.map((page) => page.data.data)?.flat()?.map((lp) => <LpCard key={lp.id} lp={lp} />)}
+                            {flatLps.map((lp) => <LpCard key={lp.id} lp={lp} />)}
                         </LoadingError>
                     </div>
                     <div ref={ref} className="h-2">
